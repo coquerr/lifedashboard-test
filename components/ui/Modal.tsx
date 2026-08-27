@@ -38,7 +38,7 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
         role="dialog"
         aria-modal="true"
         aria-label={title}
-        className="pb-safe relative flex max-h-[90dvh] w-full flex-col overflow-y-auto rounded-t-2xl border border-vanta-border bg-vanta-surface p-5 sm:max-w-md sm:rounded-2xl"
+        className="relative flex max-h-[90dvh] w-full flex-col overflow-y-auto rounded-t-2xl border border-vanta-border bg-vanta-surface px-5 pt-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:max-w-md sm:rounded-2xl"
       >
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-base font-semibold text-vanta-text">{title}</h2>
