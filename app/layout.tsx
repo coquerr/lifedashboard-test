@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { JetBrains_Mono, Manrope } from "next/font/google";
 
 import { AppShell } from "@/components/layout/AppShell";
+import { FocusModeProvider } from "@/components/layout/FocusModeContext";
 import { ServiceWorkerRegistration } from "@/components/pwa/ServiceWorkerRegistration";
 
 import "./globals.css";
@@ -61,7 +62,9 @@ export default function RootLayout({
     >
       <body className="min-h-dvh bg-vanta-bg font-sans text-vanta-text antialiased">
         <ServiceWorkerRegistration />
-        <AppShell>{children}</AppShell>
+        <FocusModeProvider>
+          <AppShell>{children}</AppShell>
+        </FocusModeProvider>
       </body>
     </html>
   );

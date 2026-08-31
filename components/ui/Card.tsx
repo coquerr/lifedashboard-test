@@ -1,6 +1,6 @@
-import type { ReactNode } from "react";
+import type { ComponentPropsWithoutRef, ReactNode } from "react";
 
-interface CardProps {
+interface CardProps extends ComponentPropsWithoutRef<"div"> {
   children: ReactNode;
   bracket?: boolean;
   className?: string;
@@ -11,10 +11,11 @@ interface CardProps {
  * bracket=true добавляет тонкие угловые засечки акцентного цвета —
  * фирменный визуальный элемент интерфейса.
  */
-export function Card({ children, bracket = false, className = "" }: CardProps) {
+export function Card({ children, bracket = false, className = "", ...rest }: CardProps) {
   return (
     <div
       className={`relative rounded-2xl border border-vanta-border bg-vanta-surface shadow-[0_12px_32px_-16px_rgba(0,0,0,0.7)] ${className}`}
+      {...rest}
     >
       {bracket ? (
         <>

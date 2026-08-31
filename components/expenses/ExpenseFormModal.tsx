@@ -19,10 +19,12 @@ export function ExpenseFormModal({ isOpen, onClose, onSave }: ExpenseFormModalPr
   const [amount, setAmount] = useState("");
   const [category, setCategory] = useState<ExpenseCategory>(EXPENSE_CATEGORIES[0].value);
 
+  const parsedAmount = Number(amount.replace(",", "."));
+  const isValid = title.trim().length > 0 && Number.isFinite(parsedAmount) && parsedAmount > 0;
+
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
     const trimmedTitle = title.trim();
-    const parsedAmount = Number(amount.replace(",", "."));
 
     if (trimmedTitle.length === 0 || !Number.isFinite(parsedAmount) || parsedAmount <= 0) return;
 
@@ -34,25 +36,12 @@ export function ExpenseFormModal({ isOpen, onClose, onSave }: ExpenseFormModalPr
     <Modal isOpen={isOpen} onClose={onClose} title="Новый расход">
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="expense-title" className="text-xs text-vanta-text-muted">
-            Название
-          </label>
-          <input
-            id="expense-title"
-            autoFocus
-            value={title}
-            onChange={(event) => setTitle(event.target.value)}
-            placeholder="Например: Обед"
-            className="rounded-xl border border-vanta-border bg-transparent px-3 py-2.5 text-sm text-vanta-text placeholder:text-vanta-text-dim outline-none focus:border-vanta-accent"
-          />
-        </div>
-
-        <div className="flex flex-col gap-1.5">
           <label htmlFor="expense-amount" className="text-xs text-vanta-text-muted">
             Сумма, ₽
           </label>
           <input
             id="expense-amount"
+            autoFocus
             type="number"
             inputMode="decimal"
             min="0"
@@ -60,6 +49,19 @@ export function ExpenseFormModal({ isOpen, onClose, onSave }: ExpenseFormModalPr
             value={amount}
             onChange={(event) => setAmount(event.target.value)}
             placeholder="0"
+            className="rounded-xl border border-vanta-border bg-transparent px-3 py-2.5 text-sm text-vanta-text placeholder:text-vanta-text-dim outline-none focus:border-vanta-accent"
+          />
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="expense-title" className="text-xs text-vanta-text-muted">
+            Название
+          </label>
+          <input
+            id="expense-title"
+            value={title}
+            onChange={(event) => setTitle(event.target.value)}
+            placeholder="Например: Обед"
             className="rounded-xl border border-vanta-border bg-transparent px-3 py-2.5 text-sm text-vanta-text placeholder:text-vanta-text-dim outline-none focus:border-vanta-accent"
           />
         </div>
@@ -75,7 +77,7 @@ export function ExpenseFormModal({ isOpen, onClose, onSave }: ExpenseFormModalPr
                 aria-pressed={category === option.value}
                 className={`flex items-center gap-2 rounded-xl border px-3 py-2.5 text-sm transition-colors ${
                   category === option.value
-                    ? "border-vanta-accent bg-vanta-accent/15 text-vanta-text"
+                    ? "border-vanta-accent bg-vanta-accent/15 text-vanta-accent"
                     : "border-vanta-border text-vanta-text-muted"
                 }`}
               >
@@ -96,7 +98,8 @@ export function ExpenseFormModal({ isOpen, onClose, onSave }: ExpenseFormModalPr
           </button>
           <button
             type="submit"
-            className="rounded-xl bg-vanta-accent px-4 py-2.5 text-sm font-medium text-vanta-bg transition-opacity hover:opacity-90"
+            disabled={!isValid}
+            className="rounded-xl bg-vanta-accent px-4 py-2.5 text-sm font-medium text-vanta-bg transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:opacity-40"
           >
             Сохранить
           </button>

@@ -1,4 +1,7 @@
+"use client";
+
 import { Card } from "@/components/ui/Card";
+import { useAnimatedValue } from "@/hooks/useAnimatedValue";
 import type { DailyScore, DailyScoreBreakdown } from "@/services/statisticsService";
 
 const BREAKDOWN_LABELS: Record<keyof DailyScoreBreakdown, string> = {
@@ -15,6 +18,7 @@ interface DailyScoreCardProps {
 
 export function DailyScoreCard({ score }: DailyScoreCardProps) {
   const breakdownKeys = Object.keys(score.breakdown) as (keyof DailyScoreBreakdown)[];
+  const animatedTotal = useAnimatedValue(score.total, 800);
 
   return (
     <Card bracket className="flex flex-col items-center gap-5 p-8 text-center">
@@ -24,7 +28,7 @@ export function DailyScoreCard({ score }: DailyScoreCardProps) {
 
       <div>
         <p className="font-mono text-7xl font-semibold tabular-nums tracking-tight text-vanta-text">
-          {score.total}
+          {Math.round(animatedTotal)}
         </p>
         <p className="mt-1 text-sm text-vanta-accent">{score.label}</p>
       </div>

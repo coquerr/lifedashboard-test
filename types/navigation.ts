@@ -5,4 +5,5 @@ export interface NavItem {
   href: string;
   icon: LucideIcon;
   enabled: boolean;
+  primary: boolean;
 }

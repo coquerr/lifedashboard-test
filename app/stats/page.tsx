@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Droplet, ListChecks, Repeat, Timer, Wallet } from "lucide-react";
 
 import { ComparisonCard } from "@/components/statistics/ComparisonCard";
@@ -12,15 +13,20 @@ import { useHabits } from "@/hooks/useHabits";
 import { useTasks } from "@/hooks/useTasks";
 import { useWaterLog } from "@/hooks/useWaterLog";
 import { todayISO } from "@/lib/date";
-import { formatLiters, formatMoney } from "@/lib/format";
+import { Card } from "@/components/ui/Card";
+import { StackedBarChart } from "@/components/statistics/StackedBarChart";
+import { formatDuration, formatLiters, formatMoney } from "@/lib/format";
 import * as statisticsService from "@/services/statisticsService";
 
-function formatFocusMinutes(minutes: number): string {
-  const hours = Math.floor(minutes / 60);
-  const rest = minutes % 60;
-  if (hours === 0) return `${rest} мин`;
-  return `${hours} ч ${rest} мин`;
-}
+
+type TabKey = "summary" | "productivity" | "health" | "finance";
+
+const TABS: { key: TabKey; label: string }[] = [
+  { key: "summary", label: "Сводка" },
+  { key: "productivity", label: "Продуктивность" },
+  { key: "health", label: "Здоровье" },
+  { key: "finance", label: "Финансы" },
+];
 
 export default function StatsPage() {
   const { tasks } = useTasks();
@@ -28,6 +34,7 @@ export default function StatsPage() {
   const waterLog = useWaterLog();
   const focusLog = useFocusLog();
   const { expenses } = useExpenses();
+  const [activeTab, setActiveTab] = useState<TabKey>("summary");
 
   const today = todayISO();
   const referenceDate = new Date();
@@ -74,7 +81,7 @@ export default function StatsPage() {
           />
           <StatTile
             label="Фокус"
-            value={formatFocusMinutes(summary.focusMinutes)}
+            value={formatDuration(summary.focusMinutes)}
             icon={<Timer className="h-4 w-4 text-vanta-text-dim" strokeWidth={1.75} />}
           />
           <StatTile
@@ -96,32 +103,60 @@ export default function StatsPage() {
         <DailyScoreCard score={dailyScore} />
       </section>
 
-      <section className="flex flex-col gap-4">
-        <p className="text-sm font-medium text-vanta-text-muted">Неделя</p>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <WeeklyChartCard title="Задачи по дням" data={weeklySeries.tasksCompleted} />
+      <div className="flex gap-2 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        {TABS.map((tab) => (
+          <button
+            key={tab.key}
+            type="button"
+            onClick={() => setActiveTab(tab.key)}
+            className={`shrink-0 rounded-xl border px-4 py-2 text-sm transition-colors ${
+              activeTab === tab.key
+                ? "border-vanta-accent bg-vanta-accent/15 text-vanta-accent"
+                : "border-vanta-border text-vanta-text-muted hover:text-vanta-text"
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {activeTab === "productivity" ? (
+  <section className="flex flex-col gap-4">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <WeeklyChartCard title="Задачи по дням" data={weeklySeries.tasksCompleted} />
+      <Card className="flex flex-col gap-4 p-5">
+        <p className="font-mono text-xs uppercase tracking-[0.2em] text-vanta-text-dim">
+          Время фокуса
+        </p>
+        <StackedBarChart
+          data={statisticsService.getWeeklyFocusByTag(focusLog, referenceDate)}
+          formatValue={(value) => `${value} мин`}
+        />
+      </Card>
+    </div>
+    {comparison.message ? <ComparisonCard message={comparison.message} /> : null}
+  </section>
+) : null}
+
+      {activeTab === "health" ? (
+        <section className="flex flex-col gap-4">
           <WeeklyChartCard
-            title="Время фокуса"
-            data={weeklySeries.focusMinutes}
-            formatValue={(value) => `${value} мин`}
-          />
-          <WeeklyChartCard
-            title="Вода"
-            data={weeklySeries.water}
-            formatValue={(value) => `${formatLiters(value)} л`}
-          />
+  title="Вода"
+  data={weeklySeries.water}
+  formatValue={(value) => `${formatLiters(value)} л`}
+  thresholdValue={2000}
+  thresholdLabel="2.0 л"
+/>
+        </section>
+      ) : null}
+
+      {activeTab === "finance" ? (
+        <section className="flex flex-col gap-4">
           <WeeklyChartCard
             title="Расходы"
             data={weeklySeries.expenses}
             formatValue={(value) => formatMoney(value)}
           />
-        </div>
-      </section>
-
-      {comparison.message ? (
-        <section className="flex flex-col gap-4">
-          <p className="text-sm font-medium text-vanta-text-muted">Сравнение</p>
-          <ComparisonCard message={comparison.message} />
         </section>
       ) : null}
     </div>

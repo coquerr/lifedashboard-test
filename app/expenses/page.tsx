@@ -1,7 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { Plus } from "lucide-react";
+import { useMemo, useRef, useState } from "react";
+import { Plus, Receipt } from "lucide-react";
 
 import { Card } from "@/components/ui/Card";
 import { ExpenseFormModal } from "@/components/expenses/ExpenseFormModal";
@@ -13,17 +13,23 @@ import * as expensesService from "@/services/expensesService";
 
 type RangeKey = "today" | "week" | "month";
 
+const RANGE_ORDER: RangeKey[] = ["today", "week", "month"];
+
 const RANGE_LABELS: Record<RangeKey, string> = {
   today: "Сегодня",
   week: "Неделя",
   month: "Месяц",
 };
 
+const SWIPE_THRESHOLD = 50;
+
 export default function ExpensesPage() {
   const { expenses, addExpense, removeExpense } = useExpenses();
   const [range, setRange] = useState<RangeKey>("today");
   const [modalOpen, setModalOpen] = useState(false);
   const [modalKey, setModalKey] = useState(0);
+
+  const touchStart = useRef<{ x: number; y: number } | null>(null);
 
   const today = todayISO();
 
@@ -41,8 +47,30 @@ export default function ExpensesPage() {
     setModalOpen(true);
   }
 
+  function handleTouchStart(event: React.TouchEvent) {
+    const touch = event.touches[0];
+    touchStart.current = { x: touch.clientX, y: touch.clientY };
+  }
+
+  function handleTouchEnd(event: React.TouchEvent) {
+    if (!touchStart.current) return;
+
+    const touch = event.changedTouches[0];
+    const deltaX = touch.clientX - touchStart.current.x;
+    const deltaY = touch.clientY - touchStart.current.y;
+
+    touchStart.current = null;
+
+    if (Math.abs(deltaX) < SWIPE_THRESHOLD || Math.abs(deltaX) < Math.abs(deltaY)) return;
+
+    const currentIndex = RANGE_ORDER.indexOf(range);
+    const nextIndex = deltaX < 0 ? currentIndex + 1 : currentIndex - 1;
+    const clamped = Math.min(RANGE_ORDER.length - 1, Math.max(0, nextIndex));
+    setRange(RANGE_ORDER[clamped]);
+  }
+
   return (
-    <div className="mx-auto flex w-full max-w-2xl flex-col gap-6">
+    <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
       <div>
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-vanta-text-dim">
           Финансы
@@ -67,28 +95,35 @@ export default function ExpensesPage() {
         ))}
       </div>
 
-      <Card className="flex flex-col gap-1 p-5">
-        <p className="font-mono text-xs uppercase tracking-[0.2em] text-vanta-text-dim">
-          Итого · {RANGE_LABELS[range]}
-        </p>
-        <p className="text-3xl font-semibold text-vanta-text">{formatMoney(total)}</p>
-      </Card>
-
-      <Card className="flex flex-col gap-1 p-2">
-        {filtered.length === 0 ? (
-          <p className="px-3 py-6 text-center text-sm text-vanta-text-muted">
-            Расходов за этот период нет
+      <div
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        className="flex flex-col gap-6"
+      >
+        <Card className="flex flex-col gap-1 p-5">
+          <p className="font-mono text-xs uppercase tracking-[0.2em] text-vanta-text-dim">
+            Итого · {RANGE_LABELS[range]}
           </p>
-        ) : (
-          filtered.map((expense) => (
-            <ExpenseRow
-              key={expense.id}
-              expense={expense}
-              onDelete={() => removeExpense(expense.id)}
-            />
-          ))
-        )}
-      </Card>
+          <p className="text-3xl font-semibold text-vanta-text">{formatMoney(total)}</p>
+        </Card>
+
+        <Card className="flex flex-col gap-1 p-2">
+          {filtered.length === 0 ? (
+            <div className="flex flex-col items-center gap-3 px-3 py-8 text-center">
+              <Receipt className="h-8 w-8 text-vanta-text-dim" strokeWidth={1.5} />
+              <p className="text-sm text-vanta-text-muted">Расходов за этот период нет</p>
+            </div>
+          ) : (
+            filtered.map((expense) => (
+              <ExpenseRow
+                key={expense.id}
+                expense={expense}
+                onDelete={() => removeExpense(expense.id)}
+              />
+            ))
+          )}
+        </Card>
+      </div>
 
       <button
         type="button"

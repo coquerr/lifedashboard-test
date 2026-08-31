@@ -5,7 +5,6 @@ import { HabitsCard } from "@/components/dashboard/HabitsCard";
 import { TasksCard } from "@/components/dashboard/TasksCard";
 import { UpcomingCard } from "@/components/dashboard/UpcomingCard";
 import { WaterCard } from "@/components/dashboard/WaterCard";
-import { WeatherCard } from "@/components/dashboard/WeatherCard";
 
 export function Dashboard() {
   return (
@@ -13,13 +12,10 @@ export function Dashboard() {
       <Greeting />
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-12">
-        <div className="md:col-span-4">
-          <WeatherCard />
-        </div>
-        <div className="md:col-span-4">
+        <div className="md:col-span-6">
           <UpcomingCard />
         </div>
-        <div className="md:col-span-4">
+        <div className="md:col-span-6">
           <FocusCard />
         </div>
 

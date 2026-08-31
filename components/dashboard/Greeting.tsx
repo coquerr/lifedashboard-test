@@ -39,13 +39,13 @@ export function Greeting() {
             onKeyDown={(event) => {
               if (event.key === "Enter") commitEditing();
             }}
-            className="w-40 border-b border-vanta-border bg-transparent text-vanta-text outline-none"
+            className="w-40 rounded-sm border-b border-vanta-border bg-transparent text-vanta-text outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vanta-accent focus-visible:ring-offset-2 focus-visible:ring-offset-vanta-bg"
           />
         ) : (
           <button
             type="button"
             onClick={startEditing}
-            className="text-vanta-text underline decoration-vanta-border decoration-dotted underline-offset-4 hover:decoration-vanta-accent"
+            className="rounded-sm text-vanta-text underline decoration-vanta-border decoration-dotted underline-offset-4 hover:decoration-vanta-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vanta-accent focus-visible:ring-offset-2 focus-visible:ring-offset-vanta-bg"
           >
             {name}
           </button>

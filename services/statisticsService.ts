@@ -4,7 +4,7 @@ import * as focusService from "@/services/focusService";
 import * as habitsService from "@/services/habitsService";
 import * as waterService from "@/services/waterService";
 import type { Expense } from "@/types/expenses";
-import type { FocusLog } from "@/types/focus";
+import type { FocusLog, FocusTag } from "@/types/focus";
 import type { Habit } from "@/types/habits";
 import type { Task } from "@/types/tasks";
 import type { WaterLog } from "@/types/water";
@@ -52,6 +52,11 @@ export interface DailyScore {
 
 export interface WeekComparison {
   message: string | null;
+}
+
+export interface StackedDayPoint {
+  label: string;
+  segments: { tag: FocusTag; value: number }[];
 }
 
 function capitalize(value: string): string {
@@ -116,6 +121,29 @@ export function getWeeklySeries(
       ),
     ),
   };
+}
+
+/**
+ * Недельная разбивка минут фокуса по тегам — данные для Stacked Bar
+ * Chart. Агрегирует focusLog.entries (массив сессий) на лету, без
+ * мутации исходного лога.
+ */
+export function getWeeklyFocusByTag(focusLog: FocusLog, referenceDate: Date): StackedDayPoint[] {
+  const days = getLastNDaysISO(7, referenceDate);
+
+  return days.map((date) => {
+    const sessionsForDay = focusLog.entries.filter((session) => session.date === date);
+
+    const byTag = new Map<FocusTag, number>();
+    for (const session of sessionsForDay) {
+      byTag.set(session.tag, (byTag.get(session.tag) ?? 0) + session.duration);
+    }
+
+    return {
+      label: weekdayLabel(date),
+      segments: Array.from(byTag.entries()).map(([tag, value]) => ({ tag, value })),
+    };
+  });
 }
 
 function scoreLabel(total: number): string {

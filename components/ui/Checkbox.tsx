@@ -15,7 +15,7 @@ export function Checkbox({ checked, onChange, label }: CheckboxProps) {
       onClick={onChange}
       aria-pressed={checked}
       aria-label={label}
-      className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition-colors ${
+      className={`relative flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition-colors before:absolute before:-inset-[12px] before:content-[''] ${
         checked
           ? "border-vanta-accent bg-vanta-accent/15"
           : "border-vanta-border bg-transparent"

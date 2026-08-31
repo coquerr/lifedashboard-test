@@ -4,9 +4,24 @@ import { useState } from "react";
 import type { FormEvent } from "react";
 
 import { Modal } from "@/components/ui/Modal";
+import { useConfirmDelete } from "@/hooks/useConfirmDelete";
 import type { Habit, HabitFrequency, HabitInput } from "@/types/habits";
 
 const ICONS = ["💧", "🏋️", "📚", "📖", "🧘", "🏃", "🥗", "😴", "🎯", "✍️", "🎸", "🌱"];
+
+const TITLE_PLACEHOLDERS = [
+  "Например: Читать",
+  "Чтение на английском",
+  "Силовая тренировка",
+  "Утренняя растяжка",
+  "Медитация 10 минут",
+  "Ложиться до полуночи",
+];
+
+function getRandomPlaceholder(): string {
+  const index = Math.floor(Math.random() * TITLE_PLACEHOLDERS.length);
+  return TITLE_PLACEHOLDERS[index];
+}
 
 interface HabitFormModalProps {
   isOpen: boolean;
@@ -25,7 +40,15 @@ export function HabitFormModal({ isOpen, onClose, onSave, onDelete, habit }: Hab
   const [timesPerWeek, setTimesPerWeek] = useState(
     habit?.frequency.type === "weekly" ? habit.frequency.timesPerWeek : 3,
   );
-  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [placeholder] = useState(getRandomPlaceholder);
+
+  const { isConfirming: confirmingDelete, handleClick: handleDeleteClick } = useConfirmDelete(
+    () => {
+      onDelete?.();
+      onClose();
+    },
+  );
+  const isValid = title.trim().length > 0;
 
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
@@ -36,15 +59,6 @@ export function HabitFormModal({ isOpen, onClose, onSave, onDelete, habit }: Hab
       frequencyType === "daily" ? { type: "daily" } : { type: "weekly", timesPerWeek };
 
     onSave({ title: trimmed, icon, frequency });
-    onClose();
-  }
-
-  function handleDeleteClick() {
-    if (!confirmingDelete) {
-      setConfirmingDelete(true);
-      return;
-    }
-    onDelete?.();
     onClose();
   }
 
@@ -60,21 +74,21 @@ export function HabitFormModal({ isOpen, onClose, onSave, onDelete, habit }: Hab
             autoFocus
             value={title}
             onChange={(event) => setTitle(event.target.value)}
-            placeholder="Например: Читать"
+            placeholder={placeholder}
             className="rounded-xl border border-vanta-border bg-transparent px-3 py-2.5 text-sm text-vanta-text placeholder:text-vanta-text-dim outline-none focus:border-vanta-accent"
           />
         </div>
 
         <div className="flex flex-col gap-1.5">
           <span className="text-xs text-vanta-text-muted">Иконка</span>
-          <div className="grid grid-cols-6 gap-2">
+          <div className="grid grid-cols-6 gap-3">
             {ICONS.map((option) => (
               <button
                 key={option}
                 type="button"
                 onClick={() => setIcon(option)}
                 aria-pressed={icon === option}
-                className={`flex h-10 w-10 items-center justify-center rounded-xl border text-lg transition-colors ${
+                className={`flex h-11 w-11 items-center justify-center rounded-xl border text-lg transition-colors ${
                   icon === option
                     ? "border-vanta-accent bg-vanta-accent/15"
                     : "border-vanta-border bg-transparent"
@@ -160,7 +174,8 @@ export function HabitFormModal({ isOpen, onClose, onSave, onDelete, habit }: Hab
             </button>
             <button
               type="submit"
-              className="rounded-xl bg-vanta-accent px-4 py-2.5 text-sm font-medium text-vanta-bg transition-opacity hover:opacity-90"
+              disabled={!isValid}
+              className="rounded-xl bg-vanta-accent px-4 py-2.5 text-sm font-medium text-vanta-bg transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:opacity-40"
             >
               Сохранить
             </button>

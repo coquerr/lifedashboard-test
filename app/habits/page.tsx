@@ -40,7 +40,7 @@ export default function HabitsPage() {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-2xl flex-col gap-6">
+    <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
       <div>
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-vanta-text-dim">
           Регулярность
@@ -53,7 +53,7 @@ export default function HabitsPage() {
           <p className="text-sm text-vanta-text-muted">Пока нет ни одной привычки</p>
         </Card>
       ) : (
-        <div className="flex flex-col gap-3">
+        <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
           {habits.map((habit) => {
             const doneToday = isHabitDoneOnDate(habit, today);
             const { completed, target } = getWeeklyProgress(habit, new Date());
@@ -79,7 +79,7 @@ export default function HabitsPage() {
                     >
                       {habit.title}
                     </span>
-                    <span className="text-xs text-vanta-text-dim">
+                    <span className="text-xs text-vanta-text-muted">
                       {completed}/{target}
                     </span>
                   </button>

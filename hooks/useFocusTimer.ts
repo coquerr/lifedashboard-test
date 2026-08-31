@@ -6,9 +6,9 @@ import { useLocalStorageState } from "@/hooks/useLocalStorageState";
 import { todayISO } from "@/lib/date";
 import { STORAGE_KEYS } from "@/lib/storage-keys";
 import * as focusService from "@/services/focusService";
-import type { FocusDurationMinutes, FocusLog } from "@/types/focus";
+import type { FocusDurationMinutes, FocusLog, FocusTag } from "@/types/focus";
 
-const DEFAULT_LOG: FocusLog = { entries: {} };
+const DEFAULT_LOG: FocusLog = { entries: [] };
 const DURATIONS: FocusDurationMinutes[] = [25, 50, 90];
 
 export function useFocusTimer() {
@@ -16,7 +16,19 @@ export function useFocusTimer() {
   const [duration, setDuration] = useState<FocusDurationMinutes>(25);
   const [secondsLeft, setSecondsLeft] = useState(duration * 60);
   const [isRunning, setIsRunning] = useState(false);
+  const [tag, setTag] = useState<FocusTag>("untracked");
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const hasMigratedRef = useRef(false);
+
+  useEffect(() => {
+    if (hasMigratedRef.current) return;
+    hasMigratedRef.current = true;
+
+    const { log: migratedLog, wasMigrated } = focusService.migrateFocusLog(log);
+    if (wasMigrated) {
+      setLog(migratedLog);
+    }
+  }, [log, setLog]);
 
   const todayMinutes = focusService.getTodayMinutes(log);
 
@@ -27,7 +39,7 @@ export function useFocusTimer() {
       setSecondsLeft((prev) => {
         if (prev <= 1) {
           setIsRunning(false);
-          setLog((current) => focusService.addMinutes(current, todayISO(), duration));
+          setLog((current) => focusService.addSession(current, todayISO(), duration, tag));
           return duration * 60;
         }
         return prev - 1;
@@ -37,7 +49,7 @@ export function useFocusTimer() {
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [isRunning, duration, setLog]);
+  }, [isRunning, duration, tag, setLog]);
 
   const toggle = useCallback(() => setIsRunning((prev) => !prev), []);
 
@@ -58,6 +70,8 @@ export function useFocusTimer() {
     secondsLeft,
     isRunning,
     todayMinutes,
+    tag,
+    setTag,
     toggle,
     reset,
     selectDuration,

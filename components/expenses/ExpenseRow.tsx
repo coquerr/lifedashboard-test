@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import { Trash2 } from "lucide-react";
 
+import { useConfirmDelete } from "@/hooks/useConfirmDelete";
 import { EXPENSE_CATEGORIES } from "@/lib/expense-categories";
 import { formatMoney } from "@/lib/format";
 import type { Expense } from "@/types/expenses";
@@ -13,16 +13,8 @@ interface ExpenseRowProps {
 }
 
 export function ExpenseRow({ expense, onDelete }: ExpenseRowProps) {
-  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const { isConfirming, handleClick } = useConfirmDelete(onDelete);
   const category = EXPENSE_CATEGORIES.find((option) => option.value === expense.category);
-
-  function handleDeleteClick() {
-    if (!confirmingDelete) {
-      setConfirmingDelete(true);
-      return;
-    }
-    onDelete();
-  }
 
   return (
     <div className="flex items-center gap-3 rounded-xl px-3 py-3 transition-colors hover:bg-vanta-surface-hover">
@@ -34,10 +26,10 @@ export function ExpenseRow({ expense, onDelete }: ExpenseRowProps) {
       <span className="text-sm text-vanta-text">{formatMoney(expense.amount)}</span>
       <button
         type="button"
-        onClick={handleDeleteClick}
-        aria-label={confirmingDelete ? "Подтвердить удаление" : "Удалить расход"}
-        className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors ${
-          confirmingDelete
+        onClick={handleClick}
+        aria-label={isConfirming ? "Подтвердить удаление" : "Удалить расход"}
+        className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-lg transition-colors ${
+          isConfirming
             ? "bg-red-500/15 text-red-400"
             : "text-vanta-text-dim hover:text-red-400"
         }`}

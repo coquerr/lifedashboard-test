@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { FormEvent } from "react";
 
 import { Modal } from "@/components/ui/Modal";
+import { useConfirmDelete } from "@/hooks/useConfirmDelete";
 import type { Task, TaskInput } from "@/types/tasks";
 
 interface TaskFormModalProps {
@@ -26,7 +27,14 @@ export function TaskFormModal({
   const [title, setTitle] = useState(task?.title ?? "");
   const [date, setDate] = useState(task?.date ?? defaultDate);
   const [time, setTime] = useState(task?.time ?? "");
-  const [confirmingDelete, setConfirmingDelete] = useState(false);
+
+  const { isConfirming: confirmingDelete, handleClick: handleDeleteClick } = useConfirmDelete(
+    () => {
+      onDelete?.();
+      onClose();
+    },
+  );
+  const isValid = title.trim().length > 0;
 
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
@@ -34,15 +42,6 @@ export function TaskFormModal({
     if (trimmed.length === 0) return;
 
     onSave({ title: trimmed, date, time: time.length > 0 ? time : null });
-    onClose();
-  }
-
-  function handleDeleteClick() {
-    if (!confirmingDelete) {
-      setConfirmingDelete(true);
-      return;
-    }
-    onDelete?.();
     onClose();
   }
 
@@ -115,7 +114,8 @@ export function TaskFormModal({
             </button>
             <button
               type="submit"
-              className="rounded-xl bg-vanta-accent px-4 py-2.5 text-sm font-medium text-vanta-bg transition-opacity hover:opacity-90"
+              disabled={!isValid}
+              className="rounded-xl bg-vanta-accent px-4 py-2.5 text-sm font-medium text-vanta-bg transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:opacity-40"
             >
               Сохранить
             </button>
