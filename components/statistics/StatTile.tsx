@@ -1,7 +1,5 @@
 import type { ReactNode } from "react";
 
-import { Card } from "@/components/ui/Card";
-
 interface StatTileProps {
   label: string;
   value: string;
@@ -11,15 +9,13 @@ interface StatTileProps {
 
 export function StatTile({ label, value, caption, icon }: StatTileProps) {
   return (
-    <Card className="flex flex-col gap-2 p-4">
-      <div className="flex items-center justify-between">
-        <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-vanta-text-dim">
-          {label}
-        </p>
-        {icon}
-      </div>
-      <p className="text-2xl font-semibold text-vanta-text">{value}</p>
-      {caption ? <p className="text-xs text-vanta-text-muted">{caption}</p> : null}
-    </Card>
+    <div className="flex flex-1 flex-col items-center gap-1.5 text-center">
+      {icon ? <div className="text-vanta-text-dim">{icon}</div> : null}
+      <p className="text-xl font-semibold text-vanta-text sm:text-2xl">{value}</p>
+      <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-vanta-text-dim">
+        {label}
+      </p>
+      {caption ? <p className="text-[11px] text-vanta-text-muted">{caption}</p> : null}
+    </div>
   );
 }

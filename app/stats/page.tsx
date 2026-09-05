@@ -69,7 +69,7 @@ export default function StatsPage() {
 
       <section className="flex flex-col gap-4">
         <p className="text-sm font-medium text-vanta-text-muted">Сегодня</p>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+        <div className="flex items-start justify-between gap-2 sm:gap-4">
           <StatTile
             label="Задачи"
             value={`${summary.tasksDone}/${summary.tasksTotal}`}
@@ -100,19 +100,18 @@ export default function StatsPage() {
       </section>
 
       <section className="flex flex-col gap-4">
-        <p className="text-sm font-medium text-vanta-text-muted">Daily Score</p>
         <DailyScoreCard score={dailyScore} />
       </section>
 
       <section className="flex flex-col gap-4">
-  <ActivityHeatmap
-    tasks={tasks}
-    habits={habits}
-    waterLog={waterLog}
-    focusLog={focusLog}
-    expenses={expenses}
-  />
-</section>
+        <ActivityHeatmap
+          tasks={tasks}
+          habits={habits}
+          waterLog={waterLog}
+          focusLog={focusLog}
+          expenses={expenses}
+        />
+      </section>
 
       <div className="flex gap-2 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {TABS.map((tab) => (
@@ -132,32 +131,32 @@ export default function StatsPage() {
       </div>
 
       {activeTab === "productivity" ? (
-  <section className="flex flex-col gap-4">
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-      <WeeklyChartCard title="Задачи по дням" data={weeklySeries.tasksCompleted} />
-      <Card className="flex flex-col gap-4 p-5">
-        <p className="font-mono text-xs uppercase tracking-[0.2em] text-vanta-text-dim">
-          Время фокуса
-        </p>
-        <StackedBarChart
-          data={statisticsService.getWeeklyFocusByTag(focusLog, referenceDate)}
-          formatValue={(value) => `${value} мин`}
-        />
-      </Card>
-    </div>
-    {comparison.message ? <ComparisonCard message={comparison.message} /> : null}
-  </section>
-) : null}
+        <section className="flex flex-col gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <WeeklyChartCard title="Задачи по дням" data={weeklySeries.tasksCompleted} />
+            <Card className="flex flex-col gap-4 p-5">
+              <p className="font-mono text-xs uppercase tracking-[0.2em] text-vanta-text-dim">
+                Время фокуса
+              </p>
+              <StackedBarChart
+                data={statisticsService.getWeeklyFocusByTag(focusLog, referenceDate)}
+                formatValue={(value) => `${value} мин`}
+              />
+            </Card>
+          </div>
+          {comparison.message ? <ComparisonCard message={comparison.message} /> : null}
+        </section>
+      ) : null}
 
       {activeTab === "health" ? (
         <section className="flex flex-col gap-4">
           <WeeklyChartCard
-  title="Вода"
-  data={weeklySeries.water}
-  formatValue={(value) => `${formatLiters(value)} л`}
-  thresholdValue={2000}
-  thresholdLabel="2.0 л"
-/>
+            title="Вода"
+            data={weeklySeries.water}
+            formatValue={(value) => `${formatLiters(value)} л`}
+            thresholdValue={2000}
+            thresholdLabel="2.0 л"
+          />
         </section>
       ) : null}
 

@@ -1,6 +1,5 @@
 "use client";
 
-import { Card } from "@/components/ui/Card";
 import { useAnimatedValue } from "@/hooks/useAnimatedValue";
 import type { DailyScore, DailyScoreBreakdown } from "@/services/statisticsService";
 
@@ -20,32 +19,27 @@ export function DailyScoreCard({ score }: DailyScoreCardProps) {
   const breakdownKeys = Object.keys(score.breakdown) as (keyof DailyScoreBreakdown)[];
   const animatedTotal = useAnimatedValue(score.total, 800);
 
+  const breakdownText = breakdownKeys
+    .map((key) => `${BREAKDOWN_LABELS[key]}: ${score.breakdown[key]}`)
+    .join(" • ");
+
   return (
-    <Card bracket className="flex flex-col items-center gap-5 p-8 text-center">
+    <div className="relative flex flex-col items-center gap-3 px-8 py-10 text-center">
+      <span className="pointer-events-none absolute left-0 top-0 h-3 w-3 border-l border-t border-vanta-accent/50" />
+      <span className="pointer-events-none absolute right-0 top-0 h-3 w-3 border-r border-t border-vanta-accent/50" />
+      <span className="pointer-events-none absolute bottom-0 left-0 h-3 w-3 border-b border-l border-vanta-accent/50" />
+      <span className="pointer-events-none absolute bottom-0 right-0 h-3 w-3 border-b border-r border-vanta-accent/50" />
+
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-vanta-text-dim">
         Daily Score
       </p>
 
-      <div>
-        <p className="font-mono text-7xl font-semibold tabular-nums tracking-tight text-vanta-text">
-          {Math.round(animatedTotal)}
-        </p>
-        <p className="mt-1 text-sm text-vanta-accent">{score.label}</p>
-      </div>
-
-      <div className="grid w-full grid-cols-5 gap-2 text-xs">
-        {breakdownKeys.map((key) => (
-          <div key={key} className="flex flex-col items-center gap-1">
-            <span className="text-vanta-text-dim">{BREAKDOWN_LABELS[key]}</span>
-            <span className="font-mono text-vanta-text">+{score.breakdown[key]}</span>
-          </div>
-        ))}
-      </div>
-
-      <p className="max-w-xs text-[11px] leading-relaxed text-vanta-text-dim">
-        Игровой показатель активности за день — не медицинская и не объективная оценка
-        продуктивности.
+      <p className="font-mono text-8xl font-semibold tabular-nums tracking-tight text-vanta-text">
+        {Math.round(animatedTotal)}
       </p>
-    </Card>
+      <p className="text-sm text-vanta-accent">{score.label}</p>
+
+      <p className="mt-2 font-mono text-xs text-vanta-text-dim">{breakdownText}</p>
+    </div>
   );
 }
