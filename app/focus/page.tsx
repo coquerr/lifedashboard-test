@@ -1,11 +1,13 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { Pause, Play, RotateCcw } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Pause, Play, Plus, RotateCcw } from "lucide-react";
 
 import { Card } from "@/components/ui/Card";
+import { CardFormModal } from "@/components/focus/CardFormModal";
 import { CircularProgress } from "@/components/focus/CircularProgress";
 import { useFocusMode } from "@/components/layout/FocusModeContext";
+import { useFlashcards } from "@/hooks/useFlashcards";
 import { useFocusTimer } from "@/hooks/useFocusTimer";
 import { formatCountdown, formatDuration } from "@/lib/format";
 
@@ -23,6 +25,8 @@ export default function FocusPage() {
 
   const { setFocusMode } = useFocusMode();
   const wakeLockRef = useRef<WakeLockSentinel | null>(null);
+  const { addCard } = useFlashcards();
+  const [isCardModalOpen, setIsCardModalOpen] = useState(false);
 
   useEffect(() => {
     setFocusMode(isRunning);
@@ -65,11 +69,22 @@ export default function FocusPage() {
 
   return (
     <div className="mx-auto flex w-full max-w-md flex-col gap-6">
-      <div>
-        <p className="font-mono text-xs uppercase tracking-[0.2em] text-vanta-text-dim">
-          Концентрация
-        </p>
-        <h1 className="mt-2 text-2xl font-semibold text-vanta-text">Фокус</h1>
+      <div className="flex items-start justify-between">
+        <div>
+          <p className="font-mono text-xs uppercase tracking-[0.2em] text-vanta-text-dim">
+            Концентрация
+          </p>
+          <h1 className="mt-2 text-2xl font-semibold text-vanta-text">Фокус</h1>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => setIsCardModalOpen(true)}
+          aria-label="Добавить карточку для повторения"
+          className="flex h-11 w-11 items-center justify-center rounded-full border border-vanta-border text-vanta-text-muted transition-colors hover:border-vanta-accent hover:text-vanta-accent"
+        >
+          <Plus className="h-4 w-4" strokeWidth={2} />
+        </button>
       </div>
 
       <Card bracket className="flex flex-col items-center gap-10 p-10">
@@ -128,6 +143,12 @@ export default function FocusPage() {
           Сегодня: {formatDuration(todayMinutes)}
         </p>
       </Card>
+
+      <CardFormModal
+        isOpen={isCardModalOpen}
+        onClose={() => setIsCardModalOpen(false)}
+        onSave={addCard}
+      />
     </div>
   );
 }

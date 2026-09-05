@@ -1,10 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { FormEvent } from "react";
+import { Calendar, Clock, X } from "lucide-react";
 
 import { Modal } from "@/components/ui/Modal";
 import { useConfirmDelete } from "@/hooks/useConfirmDelete";
+import { useDebouncedValue } from "@/hooks/useDebouncedValue";
+import { parseNaturalLanguage } from "@/lib/smartParser";
+import { toISODate } from "@/lib/date";
 import type { Task, TaskInput } from "@/types/tasks";
 
 interface TaskFormModalProps {
@@ -27,6 +31,23 @@ export function TaskFormModal({
   const [title, setTitle] = useState(task?.title ?? "");
   const [date, setDate] = useState(task?.date ?? defaultDate);
   const [time, setTime] = useState(task?.time ?? "");
+  const [isDateTouched, setIsDateTouched] = useState(Boolean(task));
+  const [isTimeTouched, setIsTimeTouched] = useState(Boolean(task));
+
+  const debouncedTitle = useDebouncedValue(title, 350);
+  const parsed = useMemo(() => parseNaturalLanguage(debouncedTitle), [debouncedTitle]);
+
+  useEffect(() => {
+    if (parsed.date && !isDateTouched) {
+      setDate(toISODate(parsed.date));
+    }
+  }, [parsed.date, isDateTouched]);
+
+  useEffect(() => {
+    if (parsed.time && !isTimeTouched) {
+      setTime(parsed.time);
+    }
+  }, [parsed.time, isTimeTouched]);
 
   const { isConfirming: confirmingDelete, handleClick: handleDeleteClick } = useConfirmDelete(
     () => {
@@ -36,14 +57,28 @@ export function TaskFormModal({
   );
   const isValid = title.trim().length > 0;
 
+  function dismissDateBadge() {
+    setIsDateTouched(true);
+  }
+
+  function dismissTimeBadge() {
+    setIsTimeTouched(true);
+    setTime("");
+  }
+
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
-    const trimmed = title.trim();
-    if (trimmed.length === 0) return;
+    const finalParsed = parseNaturalLanguage(title);
+    const finalTitle = finalParsed.cleanText.length > 0 ? finalParsed.cleanText : title.trim();
 
-    onSave({ title: trimmed, date, time: time.length > 0 ? time : null });
+    if (finalTitle.length === 0) return;
+
+    onSave({ title: finalTitle, date, time: time.length > 0 ? time : null });
     onClose();
   }
+
+  const showDateBadge = parsed.date && !isDateTouched;
+  const showTimeBadge = parsed.time && !isTimeTouched;
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={task ? "Изменить задачу" : "Новая задача"}>
@@ -57,9 +92,35 @@ export function TaskFormModal({
             autoFocus
             value={title}
             onChange={(event) => setTitle(event.target.value)}
-            placeholder="Например: Позвонить в банк"
+            placeholder="Например: Позвонить в банк завтра в 15:00"
             className="rounded-xl border border-vanta-border bg-transparent px-3 py-2.5 text-sm text-vanta-text placeholder:text-vanta-text-dim outline-none focus:border-vanta-accent"
           />
+          {showDateBadge || showTimeBadge ? (
+            <div className="flex flex-wrap gap-1.5 pt-0.5">
+              {showDateBadge ? (
+                <button
+                  type="button"
+                  onClick={dismissDateBadge}
+                  className="flex items-center gap-1 rounded-full bg-vanta-accent/15 px-2.5 py-1 text-xs text-vanta-accent transition-opacity hover:opacity-80"
+                >
+                  <Calendar className="h-3 w-3" strokeWidth={2} />
+                  {parsed.date?.toLocaleDateString("ru-RU", { day: "numeric", month: "short" })}
+                  <X className="h-3 w-3" strokeWidth={2} />
+                </button>
+              ) : null}
+              {showTimeBadge ? (
+                <button
+                  type="button"
+                  onClick={dismissTimeBadge}
+                  className="flex items-center gap-1 rounded-full bg-vanta-accent/15 px-2.5 py-1 text-xs text-vanta-accent transition-opacity hover:opacity-80"
+                >
+                  <Clock className="h-3 w-3" strokeWidth={2} />
+                  {parsed.time}
+                  <X className="h-3 w-3" strokeWidth={2} />
+                </button>
+              ) : null}
+            </div>
+          ) : null}
         </div>
 
         <div className="flex gap-3">
@@ -71,7 +132,10 @@ export function TaskFormModal({
               id="task-date"
               type="date"
               value={date}
-              onChange={(event) => setDate(event.target.value)}
+              onChange={(event) => {
+                setDate(event.target.value);
+                setIsDateTouched(true);
+              }}
               className="rounded-xl border border-vanta-border bg-transparent px-3 py-2.5 text-sm text-vanta-text outline-none focus:border-vanta-accent [color-scheme:dark]"
             />
           </div>
@@ -83,7 +147,10 @@ export function TaskFormModal({
               id="task-time"
               type="time"
               value={time}
-              onChange={(event) => setTime(event.target.value)}
+              onChange={(event) => {
+                setTime(event.target.value);
+                setIsTimeTouched(true);
+              }}
               className="rounded-xl border border-vanta-border bg-transparent px-3 py-2.5 text-sm text-vanta-text outline-none focus:border-vanta-accent [color-scheme:dark]"
             />
           </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Minus, Plus } from "lucide-react";
+import { Dumbbell, Plus } from "lucide-react";
 
 import { Card } from "@/components/ui/Card";
 import { ProgressBar } from "@/components/ui/ProgressBar";
@@ -9,14 +9,14 @@ import { useAnimatedValue } from "@/hooks/useAnimatedValue";
 import { useWater } from "@/hooks/useWater";
 import { formatLiters } from "@/lib/format";
 
-const BUTTON_BASE =
-  "flex items-center justify-center gap-1.5 rounded-xl border border-vanta-border px-4 py-3 text-sm font-medium text-vanta-text transition-colors hover:border-vanta-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vanta-accent focus-visible:ring-offset-2 focus-visible:ring-offset-vanta-bg";
-
 function vibrate() {
   if (typeof navigator !== "undefined" && "vibrate" in navigator) {
     navigator.vibrate(50);
   }
 }
+
+const HERO_BUTTON_BASE =
+  "flex flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-xl border border-vanta-border px-3 py-3.5 text-sm font-medium text-vanta-text transition-colors hover:border-vanta-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vanta-accent focus-visible:ring-offset-2 focus-visible:ring-offset-vanta-bg";
 
 export default function WaterPage() {
   const { goalMl, todayAmountMl, addWater, setGoal } = useWater();
@@ -54,11 +54,18 @@ export default function WaterPage() {
       </div>
 
       <Card bracket className="flex flex-col items-center gap-6 p-8">
-        <div className="flex flex-col items-center gap-2 text-center">
-          <p className="font-mono text-6xl font-semibold tabular-nums tracking-tight text-vanta-text">
-            {formatLiters(Math.round(animatedAmountMl))}
-          </p>
-          <p className="text-sm text-vanta-text-muted">
+        <p className="font-mono text-7xl font-semibold tabular-nums tracking-tight text-vanta-text">
+          {formatLiters(Math.round(animatedAmountMl))}
+        </p>
+
+        <div className="flex w-full flex-col items-center gap-2">
+          <ProgressBar
+            value={progress}
+            className="h-2"
+            trackClassName="bg-white/10"
+            glow
+          />
+          <p className="text-xs text-vanta-text-dim">
             из{" "}
             {isEditingGoal ? (
               <input
@@ -70,7 +77,7 @@ export default function WaterPage() {
                 onKeyDown={(event) => {
                   if (event.key === "Enter") commitGoal();
                 }}
-                className="w-12 rounded-sm border-b border-vanta-border bg-transparent text-center text-vanta-text-muted outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vanta-accent focus-visible:ring-offset-2 focus-visible:ring-offset-vanta-bg"
+                className="w-10 rounded-sm border-b border-vanta-border bg-transparent text-center text-vanta-text-dim outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vanta-accent focus-visible:ring-offset-2 focus-visible:ring-offset-vanta-bg"
               />
             ) : (
               <button
@@ -85,37 +92,28 @@ export default function WaterPage() {
           </p>
         </div>
 
-        <div className="w-full">
-          <ProgressBar
-            value={progress}
-            className="h-2 transition-[width] duration-500 ease-out"
-            trackClassName="bg-[#333333]"
-          />
+        <div className="flex w-full gap-2">
+          <button type="button" onClick={() => handleAddWater(250)} className={HERO_BUTTON_BASE}>
+            <Plus className="h-3.5 w-3.5 shrink-0" strokeWidth={2} />
+            250
+          </button>
+          <button type="button" onClick={() => handleAddWater(300)} className={HERO_BUTTON_BASE}>
+            <Dumbbell className="h-3.5 w-3.5 shrink-0" strokeWidth={2} />
+            300
+          </button>
+          <button type="button" onClick={() => handleAddWater(500)} className={HERO_BUTTON_BASE}>
+            <Plus className="h-3.5 w-3.5 shrink-0" strokeWidth={2} />
+            500
+          </button>
         </div>
 
-        <div className="grid w-full grid-cols-2 gap-2">
-          <button
-            type="button"
-            onClick={() => handleAddWater(-250)}
-            aria-label="Уменьшить на 250 мл"
-            className={BUTTON_BASE}
-          >
-            <Minus className="h-3.5 w-3.5" strokeWidth={2} />
-            250 мл
-          </button>
-          <button type="button" onClick={() => handleAddWater(250)} className={BUTTON_BASE}>
-            <Plus className="h-3.5 w-3.5" strokeWidth={2} />
-            250 мл
-          </button>
-          <button type="button" onClick={() => handleAddWater(300)} className={BUTTON_BASE}>
-            <Plus className="h-3.5 w-3.5" strokeWidth={2} />
-            300 мл (шейкер)
-          </button>
-          <button type="button" onClick={() => handleAddWater(500)} className={BUTTON_BASE}>
-            <Plus className="h-3.5 w-3.5" strokeWidth={2} />
-            500 мл
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={() => handleAddWater(-250)}
+          className="text-xs text-vanta-text-dim transition-colors hover:text-vanta-text-muted"
+        >
+          −250
+        </button>
       </Card>
     </div>
   );

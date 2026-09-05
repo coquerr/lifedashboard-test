@@ -14,6 +14,7 @@ import { useTasks } from "@/hooks/useTasks";
 import { useWaterLog } from "@/hooks/useWaterLog";
 import { todayISO } from "@/lib/date";
 import { Card } from "@/components/ui/Card";
+import { ActivityHeatmap } from "@/components/statistics/ActivityHeatmap";
 import { StackedBarChart } from "@/components/statistics/StackedBarChart";
 import { formatDuration, formatLiters, formatMoney } from "@/lib/format";
 import * as statisticsService from "@/services/statisticsService";
@@ -102,6 +103,16 @@ export default function StatsPage() {
         <p className="text-sm font-medium text-vanta-text-muted">Daily Score</p>
         <DailyScoreCard score={dailyScore} />
       </section>
+
+      <section className="flex flex-col gap-4">
+  <ActivityHeatmap
+    tasks={tasks}
+    habits={habits}
+    waterLog={waterLog}
+    focusLog={focusLog}
+    expenses={expenses}
+  />
+</section>
 
       <div className="flex gap-2 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {TABS.map((tab) => (
