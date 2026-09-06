@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus } from "lucide-react";
+import { Plus, Repeat } from "lucide-react";
 
 import { Card } from "@/components/ui/Card";
 import { Checkbox } from "@/components/ui/Checkbox";
@@ -9,6 +9,7 @@ import { ProgressBar } from "@/components/ui/ProgressBar";
 import { HabitFormModal } from "@/components/habits/HabitFormModal";
 import { useHabits } from "@/hooks/useHabits";
 import { todayISO } from "@/lib/date";
+import { HABIT_ICON_MAP } from "@/lib/habitIconMap";
 import { getWeeklyProgress, isHabitDoneOnDate } from "@/services/habitsService";
 import type { Habit, HabitInput } from "@/types/habits";
 
@@ -49,14 +50,16 @@ export default function HabitsPage() {
       </div>
 
       {habits.length === 0 ? (
-        <Card className="flex flex-col items-center gap-2 p-8 text-center">
+        <div className="flex flex-col items-center gap-3 py-16 text-center">
+          <Repeat className="h-8 w-8 text-vanta-text-dim" strokeWidth={1.5} />
           <p className="text-sm text-vanta-text-muted">Пока нет ни одной привычки</p>
-        </Card>
+        </div>
       ) : (
         <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
           {habits.map((habit) => {
             const doneToday = isHabitDoneOnDate(habit, today);
             const { completed, target } = getWeeklyProgress(habit, new Date());
+            const IconComponent = HABIT_ICON_MAP[habit.icon];
 
             return (
               <Card key={habit.id} className="flex flex-col gap-3 p-4">
@@ -71,7 +74,12 @@ export default function HabitsPage() {
                     onClick={() => openEditModal(habit)}
                     className="flex flex-1 items-center gap-3 text-left"
                   >
-                    <span className="text-xl">{habit.icon}</span>
+                    {IconComponent ? (
+                      <IconComponent
+                        className="h-5 w-5 text-vanta-text-dim"
+                        strokeWidth={1.75}
+                      />
+                    ) : null}
                     <span
                       className={`flex-1 text-sm ${
                         doneToday ? "text-vanta-text" : "text-vanta-text-muted"

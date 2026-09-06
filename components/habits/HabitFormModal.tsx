@@ -5,9 +5,8 @@ import type { FormEvent } from "react";
 
 import { Modal } from "@/components/ui/Modal";
 import { useConfirmDelete } from "@/hooks/useConfirmDelete";
+import { DEFAULT_HABIT_ICON_ID, HABIT_ICON_IDS, HABIT_ICON_MAP } from "@/lib/habitIconMap";
 import type { Habit, HabitFrequency, HabitInput } from "@/types/habits";
-
-const ICONS = ["💧", "🏋️", "📚", "📖", "🧘", "🏃", "🥗", "😴", "🎯", "✍️", "🎸", "🌱"];
 
 const TITLE_PLACEHOLDERS = [
   "Например: Читать",
@@ -33,7 +32,7 @@ interface HabitFormModalProps {
 
 export function HabitFormModal({ isOpen, onClose, onSave, onDelete, habit }: HabitFormModalProps) {
   const [title, setTitle] = useState(habit?.title ?? "");
-  const [icon, setIcon] = useState(habit?.icon ?? ICONS[0]);
+  const [icon, setIcon] = useState(habit?.icon ?? DEFAULT_HABIT_ICON_ID);
   const [frequencyType, setFrequencyType] = useState<HabitFrequency["type"]>(
     habit?.frequency.type ?? "daily",
   );
@@ -82,21 +81,26 @@ export function HabitFormModal({ isOpen, onClose, onSave, onDelete, habit }: Hab
         <div className="flex flex-col gap-1.5">
           <span className="text-xs text-vanta-text-muted">Иконка</span>
           <div className="grid grid-cols-6 gap-3">
-            {ICONS.map((option) => (
-              <button
-                key={option}
-                type="button"
-                onClick={() => setIcon(option)}
-                aria-pressed={icon === option}
-                className={`flex h-11 w-11 items-center justify-center rounded-xl border text-lg transition-colors ${
-                  icon === option
-                    ? "border-vanta-accent bg-vanta-accent/15"
-                    : "border-vanta-border bg-transparent"
-                }`}
-              >
-                {option}
-              </button>
-            ))}
+            {HABIT_ICON_IDS.map((iconId) => {
+              const IconComponent = HABIT_ICON_MAP[iconId];
+              const isSelected = icon === iconId;
+
+              return (
+                <button
+                  key={iconId}
+                  type="button"
+                  onClick={() => setIcon(iconId)}
+                  aria-pressed={isSelected}
+                  className={`flex h-11 w-11 items-center justify-center rounded-xl border transition-colors ${
+                    isSelected
+                      ? "border-vanta-accent bg-vanta-accent/10 text-vanta-accent"
+                      : "border-transparent bg-white/5 text-white/50 hover:text-white"
+                  }`}
+                >
+                  <IconComponent className="h-5 w-5" strokeWidth={1.75} />
+                </button>
+              );
+            })}
           </div>
         </div>
 

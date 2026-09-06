@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 
-import { Card } from "@/components/ui/Card";
 import { Checkbox } from "@/components/ui/Checkbox";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import { useHabits } from "@/hooks/useHabits";
 import { todayISO } from "@/lib/date";
+import { HABIT_ICON_MAP } from "@/lib/habitIconMap";
 import { getWeeklyProgress, isHabitDoneOnDate } from "@/services/habitsService";
 
 export function HabitsCard() {
@@ -14,7 +14,7 @@ export function HabitsCard() {
   const today = todayISO();
 
   return (
-    <Card className="flex flex-col gap-4 p-5">
+    <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-vanta-text-dim">
           Привычки
@@ -31,6 +31,7 @@ export function HabitsCard() {
           {habits.map((habit) => {
             const doneToday = isHabitDoneOnDate(habit, today);
             const { completed, target } = getWeeklyProgress(habit, new Date());
+            const IconComponent = HABIT_ICON_MAP[habit.icon];
 
             return (
               <li key={habit.id} className="flex flex-col gap-2">
@@ -40,7 +41,12 @@ export function HabitsCard() {
                     onChange={() => toggleHabit(habit.id, today)}
                     label={habit.title}
                   />
-                  <span className="text-base">{habit.icon}</span>
+                  {IconComponent ? (
+                    <IconComponent
+                      className="h-4 w-4 text-vanta-text-dim"
+                      strokeWidth={1.75}
+                    />
+                  ) : null}
                   <span
                     className={`flex-1 text-sm ${
                       doneToday ? "text-vanta-text" : "text-vanta-text-muted"
@@ -58,6 +64,6 @@ export function HabitsCard() {
           })}
         </ul>
       )}
-    </Card>
+    </div>
   );
 }

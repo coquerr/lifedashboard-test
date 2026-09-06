@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { BookOpen } from "lucide-react";
 
-import { Card } from "@/components/ui/Card";
 import { useFlashcards } from "@/hooks/useFlashcards";
 
 export function ReviewWidget() {
@@ -13,7 +12,7 @@ export function ReviewWidget() {
 
   return (
     <Link href="/review">
-      <Card className="flex items-center gap-4 p-5 transition-colors hover:border-vanta-accent">
+      <div className="flex items-center gap-4 rounded-2xl border border-vanta-accent/40 bg-vanta-accent/[0.04] p-5 shadow-[0_0_24px_-8px_rgba(201,162,75,0.35)] transition-colors hover:border-vanta-accent">
         <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-vanta-accent/15 text-vanta-accent">
           <BookOpen className="h-5 w-5" strokeWidth={1.75} />
         </span>
@@ -25,7 +24,7 @@ export function ReviewWidget() {
             Повторить {dueCards.length} {dueCards.length === 1 ? "карточку" : "карточек"}
           </p>
         </div>
-      </Card>
+      </div>
     </Link>
   );
 }

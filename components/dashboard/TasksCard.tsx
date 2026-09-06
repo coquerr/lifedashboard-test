@@ -4,7 +4,6 @@ import { useState } from "react";
 import Link from "next/link";
 import { Plus } from "lucide-react";
 
-import { Card } from "@/components/ui/Card";
 import { Checkbox } from "@/components/ui/Checkbox";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import { useTasks } from "@/hooks/useTasks";
@@ -28,7 +27,7 @@ export function TasksCard() {
   }
 
   return (
-    <Card className="flex flex-col gap-4 p-5">
+    <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-vanta-text-dim">
           Задачи на сегодня
@@ -61,7 +60,7 @@ export function TasksCard() {
         ) : null}
       </ul>
 
-      <div className="flex gap-2 border-t border-vanta-border pt-4">
+      <div className="flex gap-2 pt-2">
         <input
           value={draft}
           onChange={(event) => setDraft(event.target.value)}
@@ -69,7 +68,7 @@ export function TasksCard() {
             if (event.key === "Enter") handleAdd();
           }}
           placeholder="Новая задача на сегодня"
-          className="flex-1 rounded-xl border border-vanta-border bg-transparent px-3 py-2 text-sm text-vanta-text placeholder:text-vanta-text-dim outline-none focus:border-vanta-accent"
+          className="flex-1 rounded-xl border-none bg-white/5 px-3 py-2 text-sm text-vanta-text placeholder:text-vanta-text-dim outline-none transition-all focus:bg-white/[0.07] focus:ring-1 focus:ring-vanta-accent"
         />
         <button
           type="button"
@@ -80,6 +79,6 @@ export function TasksCard() {
           <Plus className="h-4 w-4" strokeWidth={2} />
         </button>
       </div>
-    </Card>
+    </div>
   );
 }

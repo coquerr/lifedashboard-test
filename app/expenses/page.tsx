@@ -1,14 +1,16 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
+import type { KeyboardEvent } from "react";
 import { Plus, Receipt } from "lucide-react";
 
-import { Card } from "@/components/ui/Card";
 import { ExpenseFormModal } from "@/components/expenses/ExpenseFormModal";
 import { ExpenseRow } from "@/components/expenses/ExpenseRow";
 import { useExpenses } from "@/hooks/useExpenses";
 import { startOfMonth, startOfWeek, todayISO, toISODate } from "@/lib/date";
+import { EXPENSE_CATEGORIES } from "@/lib/expense-categories";
 import { formatMoney } from "@/lib/format";
+import { parseNaturalLanguage } from "@/lib/smartParser";
 import * as expensesService from "@/services/expensesService";
 
 type RangeKey = "today" | "week" | "month";
@@ -28,6 +30,7 @@ export default function ExpensesPage() {
   const [range, setRange] = useState<RangeKey>("today");
   const [modalOpen, setModalOpen] = useState(false);
   const [modalKey, setModalKey] = useState(0);
+  const [quickDraft, setQuickDraft] = useState("");
 
   const touchStart = useRef<{ x: number; y: number } | null>(null);
 
@@ -45,6 +48,29 @@ export default function ExpensesPage() {
   function openCreateModal() {
     setModalKey((key) => key + 1);
     setModalOpen(true);
+  }
+
+  function handleQuickAdd() {
+    const raw = quickDraft.trim();
+    if (raw.length === 0) return;
+
+    const parsed = parseNaturalLanguage(raw);
+    if (parsed.amount === null || parsed.amount <= 0) return;
+
+    const title = parsed.cleanText.length > 0 ? parsed.cleanText : raw;
+    const matchedCategory = EXPENSE_CATEGORIES.find(
+      (option) => option.value === parsed.categoryHint,
+    );
+    const category = matchedCategory ? matchedCategory.value : "other";
+
+    addExpense({ title, amount: parsed.amount, category, date: todayISO() });
+    setQuickDraft("");
+  }
+
+  function handleQuickInputKeyDown(event: KeyboardEvent<HTMLInputElement>) {
+    if (event.key === "Enter") {
+      handleQuickAdd();
+    }
   }
 
   function handleTouchStart(event: React.TouchEvent) {
@@ -100,16 +126,31 @@ export default function ExpensesPage() {
         onTouchEnd={handleTouchEnd}
         className="flex flex-col gap-6"
       >
-        <Card className="flex flex-col gap-1 p-5">
+        <div className="relative flex flex-col items-center gap-2 px-8 py-10 text-center">
+          <span className="pointer-events-none absolute left-0 top-0 h-3 w-3 border-l border-t border-vanta-accent/50" />
+          <span className="pointer-events-none absolute right-0 top-0 h-3 w-3 border-r border-t border-vanta-accent/50" />
+          <span className="pointer-events-none absolute bottom-0 left-0 h-3 w-3 border-b border-l border-vanta-accent/50" />
+          <span className="pointer-events-none absolute bottom-0 right-0 h-3 w-3 border-b border-r border-vanta-accent/50" />
+
           <p className="font-mono text-xs uppercase tracking-[0.2em] text-vanta-text-dim">
             Итого · {RANGE_LABELS[range]}
           </p>
-          <p className="text-3xl font-semibold text-vanta-text">{formatMoney(total)}</p>
-        </Card>
+          <p className="font-mono text-8xl font-semibold tabular-nums tracking-tight text-vanta-text">
+            {formatMoney(total)}
+          </p>
+        </div>
 
-        <Card className="flex flex-col gap-1 p-2">
+        <input
+          value={quickDraft}
+          onChange={(event) => setQuickDraft(event.target.value)}
+          onKeyDown={handleQuickInputKeyDown}
+          placeholder="Например: KSB-80 1800..."
+          className="rounded-xl bg-white/5 px-4 py-3 text-sm text-vanta-text placeholder:text-vanta-text-dim outline-none transition-all focus:bg-white/[0.07] focus:ring-1 focus:ring-vanta-accent"
+        />
+
+        <div className="flex flex-col">
           {filtered.length === 0 ? (
-            <div className="flex flex-col items-center gap-3 px-3 py-8 text-center">
+            <div className="flex flex-col items-center gap-3 px-3 py-10 text-center">
               <Receipt className="h-8 w-8 text-vanta-text-dim" strokeWidth={1.5} />
               <p className="text-sm text-vanta-text-muted">Расходов за этот период нет</p>
             </div>
@@ -122,7 +163,7 @@ export default function ExpensesPage() {
               />
             ))
           )}
-        </Card>
+        </div>
       </div>
 
       <button

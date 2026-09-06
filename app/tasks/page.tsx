@@ -1,15 +1,16 @@
 "use client";
 
 import { useRef, useState } from "react";
+import type { KeyboardEvent } from "react";
 import { ChevronLeft, ChevronRight, Plus, CalendarX2 } from "lucide-react";
 
-import { Card } from "@/components/ui/Card";
 import { Checkbox } from "@/components/ui/Checkbox";
 import { DateStrip } from "@/components/tasks/DateStrip";
 import { WeekStrip } from "@/components/tasks/WeekStrip";
 import { TaskFormModal } from "@/components/tasks/TaskFormModal";
 import { useTasks } from "@/hooks/useTasks";
-import { addDaysISO, formatDateHuman, todayISO } from "@/lib/date";
+import { addDaysISO, formatDateHuman, todayISO, toISODate } from "@/lib/date";
+import { parseNaturalLanguage } from "@/lib/smartParser";
 import type { Task, TaskInput } from "@/types/tasks";
 
 const SWIPE_THRESHOLD = 50;
@@ -20,6 +21,7 @@ export default function TasksPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalKey, setModalKey] = useState(0);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [quickDraft, setQuickDraft] = useState("");
 
   const touchStart = useRef<{ x: number; y: number } | null>(null);
 
@@ -42,6 +44,24 @@ export default function TasksPage() {
       editTask(editingTask.id, input);
     } else {
       addTask(input);
+    }
+  }
+
+  function handleQuickAdd() {
+    const raw = quickDraft.trim();
+    if (raw.length === 0) return;
+
+    const parsed = parseNaturalLanguage(raw);
+    const title = parsed.cleanText.length > 0 ? parsed.cleanText : raw;
+    const date = parsed.date ? toISODate(parsed.date) : selectedDate;
+
+    addTask({ title, date, time: parsed.time });
+    setQuickDraft("");
+  }
+
+  function handleQuickInputKeyDown(event: KeyboardEvent<HTMLInputElement>) {
+    if (event.key === "Enter") {
+      handleQuickAdd();
     }
   }
 
@@ -79,7 +99,7 @@ export default function TasksPage() {
             type="button"
             onClick={() => setSelectedDate((date) => addDaysISO(date, -1))}
             aria-label="Предыдущий день"
-            className="flex h-10 w-10 items-center justify-center rounded-xl border border-vanta-border text-vanta-text-muted transition-colors hover:text-vanta-text"
+            className="flex h-10 w-10 items-center justify-center rounded-xl text-vanta-text-muted transition-colors hover:text-vanta-text"
           >
             <ChevronLeft className="h-4 w-4" strokeWidth={1.75} />
           </button>
@@ -96,7 +116,7 @@ export default function TasksPage() {
             type="button"
             onClick={() => setSelectedDate((date) => addDaysISO(date, 1))}
             aria-label="Следующий день"
-            className="flex h-10 w-10 items-center justify-center rounded-xl border border-vanta-border text-vanta-text-muted transition-colors hover:text-vanta-text"
+            className="flex h-10 w-10 items-center justify-center rounded-xl text-vanta-text-muted transition-colors hover:text-vanta-text"
           >
             <ChevronRight className="h-4 w-4" strokeWidth={1.75} />
           </button>
@@ -109,13 +129,21 @@ export default function TasksPage() {
           <WeekStrip selectedDate={selectedDate} onSelectDate={setSelectedDate} />
         </div>
 
-        <Card
-          className="flex flex-col gap-1 p-2"
+        <input
+          value={quickDraft}
+          onChange={(event) => setQuickDraft(event.target.value)}
+          onKeyDown={handleQuickInputKeyDown}
+          placeholder="Например: Тренировка завтра в 19:00..."
+          className="rounded-xl bg-white/5 px-4 py-3 text-sm text-vanta-text placeholder:text-vanta-text-dim outline-none transition-all focus:bg-white/[0.07] focus:ring-1 focus:ring-vanta-accent"
+        />
+
+        <div
+          className="flex min-h-[60vh] flex-col gap-2"
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
         >
           {tasksForDay.length === 0 ? (
-            <div className="flex flex-col items-center gap-3 px-3 py-10 text-center">
+            <div className="flex flex-1 flex-col items-center justify-center gap-3 px-3 py-10 text-center">
               <CalendarX2 className="h-8 w-8 text-vanta-text-dim" strokeWidth={1.5} />
               <p className="text-sm text-vanta-text-muted">На этот день задач нет</p>
             </div>
@@ -123,7 +151,7 @@ export default function TasksPage() {
             tasksForDay.map((task) => (
               <div
                 key={task.id}
-                className="flex items-center gap-3 rounded-xl px-3 py-3 transition-colors hover:bg-vanta-surface-hover"
+                className="flex items-center gap-3 rounded-xl bg-white/5 px-3 py-3 transition-colors hover:bg-white/[0.08]"
               >
                 <Checkbox
                   checked={task.done}
@@ -149,7 +177,7 @@ export default function TasksPage() {
               </div>
             ))
           )}
-        </Card>
+        </div>
       </div>
 
       <div className="hidden lg:block lg:pt-[52px]">

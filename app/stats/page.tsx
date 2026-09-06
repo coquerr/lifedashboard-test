@@ -4,7 +4,6 @@ import { useState } from "react";
 import { Droplet, ListChecks, Repeat, Timer, Wallet } from "lucide-react";
 
 import { ComparisonCard } from "@/components/statistics/ComparisonCard";
-import { DailyScoreCard } from "@/components/statistics/DailyScoreCard";
 import { StatTile } from "@/components/statistics/StatTile";
 import { WeeklyChartCard } from "@/components/statistics/WeeklyChartCard";
 import { useExpenses } from "@/hooks/useExpenses";
@@ -57,7 +56,6 @@ export default function StatsPage() {
     referenceDate,
   );
 
-  const dailyScore = statisticsService.computeDailyScore(summary, habits, today);
   const comparison = statisticsService.compareWeeklyTasks(tasks, referenceDate);
 
   return (
@@ -97,10 +95,6 @@ export default function StatsPage() {
             icon={<Wallet className="h-4 w-4 text-vanta-text-dim" strokeWidth={1.75} />}
           />
         </div>
-      </section>
-
-      <section className="flex flex-col gap-4">
-        <DailyScoreCard score={dailyScore} />
       </section>
 
       <section className="flex flex-col gap-4">

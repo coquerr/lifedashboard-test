@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { Droplet, Minus, Plus } from "lucide-react";
 
-import { Card } from "@/components/ui/Card";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import { useWater } from "@/hooks/useWater";
 import { formatLiters } from "@/lib/format";
@@ -29,7 +28,7 @@ export function WaterCard() {
   }
 
   return (
-    <Card className="flex flex-col gap-4 p-5">
+    <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-vanta-text-dim">
           Вода
@@ -52,13 +51,13 @@ export function WaterCard() {
                 onKeyDown={(event) => {
                   if (event.key === "Enter") commitGoal();
                 }}
-                className="w-12 rounded-sm border-b border-vanta-border bg-transparent text-vanta-text-muted outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vanta-accent focus-visible:ring-offset-2 focus-visible:ring-offset-vanta-surface"
+                className="w-12 rounded-sm border-b border-vanta-border bg-transparent text-vanta-text-muted outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vanta-accent focus-visible:ring-offset-2 focus-visible:ring-offset-vanta-bg"
               />
             ) : (
               <button
                 type="button"
                 onClick={startEditingGoal}
-                className="rounded-sm underline decoration-vanta-border decoration-dotted underline-offset-4 hover:text-vanta-text hover:decoration-vanta-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vanta-accent focus-visible:ring-offset-2 focus-visible:ring-offset-vanta-surface"
+                className="rounded-sm underline decoration-vanta-border decoration-dotted underline-offset-4 hover:text-vanta-text hover:decoration-vanta-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vanta-accent focus-visible:ring-offset-2 focus-visible:ring-offset-vanta-bg"
               >
                 {formatLiters(goalMl)}
               </button>
@@ -76,14 +75,14 @@ export function WaterCard() {
           type="button"
           onClick={() => addWater(-250)}
           aria-label="Уменьшить на 250 мл"
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-vanta-border text-vanta-text-muted transition-colors hover:text-vanta-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vanta-accent focus-visible:ring-offset-2 focus-visible:ring-offset-vanta-surface"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-vanta-border text-vanta-text-muted transition-colors hover:text-vanta-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vanta-accent focus-visible:ring-offset-2 focus-visible:ring-offset-vanta-bg"
         >
           <Minus className="h-4 w-4" strokeWidth={2} />
         </button>
         <button
           type="button"
           onClick={() => addWater(250)}
-          className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-vanta-border px-3 py-2 text-sm font-medium text-vanta-text transition-colors hover:border-vanta-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vanta-accent focus-visible:ring-offset-2 focus-visible:ring-offset-vanta-surface"
+          className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-vanta-border px-3 py-2 text-sm font-medium text-vanta-text transition-colors hover:border-vanta-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vanta-accent focus-visible:ring-offset-2 focus-visible:ring-offset-vanta-bg"
         >
           <Plus className="h-3.5 w-3.5" strokeWidth={2} />
           250
@@ -91,12 +90,12 @@ export function WaterCard() {
         <button
           type="button"
           onClick={() => addWater(500)}
-          className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-vanta-accent px-3 py-2 text-sm font-medium text-vanta-bg transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vanta-accent focus-visible:ring-offset-2 focus-visible:ring-offset-vanta-surface"
+          className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-vanta-accent px-3 py-2 text-sm font-medium text-vanta-bg transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vanta-accent focus-visible:ring-offset-2 focus-visible:ring-offset-vanta-bg"
         >
           <Plus className="h-3.5 w-3.5" strokeWidth={2} />
           500
         </button>
       </div>
-    </Card>
+    </div>
   );
 }

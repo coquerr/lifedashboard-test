@@ -23,7 +23,7 @@ export function DateStrip({ selectedDate, onSelectDate }: DateStripProps) {
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-vanta-text-dim">
         Дни
       </p>
-      <div className="flex flex-col gap-1.5">
+      <div className="flex flex-col gap-1">
         {days.map((date) => {
           const isSelected = date === selectedDate;
           const isToday = date === today;
@@ -37,10 +37,10 @@ export function DateStrip({ selectedDate, onSelectDate }: DateStripProps) {
               type="button"
               onClick={() => onSelectDate(date)}
               aria-current={isSelected ? "date" : undefined}
-              className={`flex items-center justify-between rounded-xl border px-3 py-2.5 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vanta-accent focus-visible:ring-offset-2 focus-visible:ring-offset-vanta-bg ${
+              className={`flex items-center justify-between rounded-xl px-3 py-2.5 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vanta-accent focus-visible:ring-offset-2 focus-visible:ring-offset-vanta-bg ${
                 isSelected
-                  ? "border-vanta-accent bg-vanta-accent/10 text-vanta-text"
-                  : "border-vanta-border text-vanta-text-muted hover:border-vanta-text-dim hover:text-vanta-text"
+                  ? "bg-vanta-accent/10 text-vanta-accent"
+                  : "text-white/50 hover:text-white"
               }`}
             >
               <span className="text-sm capitalize">{weekday}</span>

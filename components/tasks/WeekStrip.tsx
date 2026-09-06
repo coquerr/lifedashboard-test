@@ -33,7 +33,7 @@ export function WeekStrip({ selectedDate, onSelectDate }: WeekStripProps) {
   }, [selectedDate]);
 
   return (
-    <div className="flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:hidden">
+    <div className="flex gap-1.5 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:hidden">
       {dates.map((date) => {
         const isSelected = date === selectedDate;
         const isToday = date === today;
@@ -45,10 +45,10 @@ export function WeekStrip({ selectedDate, onSelectDate }: WeekStripProps) {
             ref={isSelected ? selectedRef : undefined}
             type="button"
             onClick={() => onSelectDate(date)}
-            className={`flex min-w-[52px] shrink-0 flex-col items-center gap-1 rounded-xl border px-2 py-2.5 transition-colors ${
+            className={`flex min-w-[52px] shrink-0 flex-col items-center gap-1 rounded-xl px-2 py-2.5 transition-colors ${
               isSelected
-                ? "border-vanta-accent bg-vanta-accent/10 text-vanta-accent"
-                : "border-vanta-border text-vanta-text-muted hover:text-vanta-text"
+                ? "bg-vanta-accent/10 text-vanta-accent"
+                : "text-white/50 hover:text-white"
             }`}
           >
             <span className="text-[10px] uppercase tracking-wide">{weekdayShort(day)}</span>

@@ -2,7 +2,6 @@
 
 import { CalendarClock } from "lucide-react";
 
-import { Card } from "@/components/ui/Card";
 import { useClientToday } from "@/hooks/useClientToday";
 import { useNow } from "@/hooks/useNow";
 import { useTasks } from "@/hooks/useTasks";
@@ -47,7 +46,7 @@ export function UpcomingCard() {
           : `через ${minutes} мин`;
 
   return (
-    <Card className="flex flex-col gap-4 p-5">
+    <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-vanta-text-dim">
           Ближайшая задача
@@ -69,6 +68,6 @@ export function UpcomingCard() {
           </p>
         </div>
       )}
-    </Card>
+    </div>
   );
 }

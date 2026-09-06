@@ -136,25 +136,30 @@ export function ExpenseFormModal({ isOpen, onClose, onSave }: ExpenseFormModalPr
         <div className="flex flex-col gap-1.5">
           <span className="text-xs text-vanta-text-muted">Категория</span>
           <div className="grid grid-cols-2 gap-2">
-            {EXPENSE_CATEGORIES.map((option) => (
-              <button
-                key={option.value}
-                type="button"
-                onClick={() => {
-                  setCategory(option.value);
-                  setIsCategoryTouched(true);
-                }}
-                aria-pressed={category === option.value}
-                className={`flex items-center gap-2 rounded-xl border px-3 py-2.5 text-sm transition-colors ${
-                  category === option.value
-                    ? "border-vanta-accent bg-vanta-accent/15 text-vanta-accent"
-                    : "border-vanta-border text-vanta-text-muted"
-                }`}
-              >
-                <span>{option.icon}</span>
-                {option.label}
-              </button>
-            ))}
+            {EXPENSE_CATEGORIES.map((option) => {
+              const IconComponent = option.icon;
+              const isSelected = category === option.value;
+
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => {
+                    setCategory(option.value);
+                    setIsCategoryTouched(true);
+                  }}
+                  aria-pressed={isSelected}
+                  className={`flex items-center gap-2 rounded-xl border px-3 py-2.5 text-sm transition-colors ${
+                    isSelected
+                      ? "border-vanta-accent bg-vanta-accent/10 text-vanta-accent"
+                      : "border-transparent bg-white/5 text-white/50 hover:text-white"
+                  }`}
+                >
+                  <IconComponent className="h-4 w-4" strokeWidth={1.75} />
+                  {option.label}
+                </button>
+              );
+            })}
           </div>
         </div>
 

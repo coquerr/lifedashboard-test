@@ -1,9 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Pause, Play, Plus, RotateCcw } from "lucide-react";
+import { Layers, Pause, Play, RotateCcw } from "lucide-react";
 
-import { Card } from "@/components/ui/Card";
 import { CardFormModal } from "@/components/focus/CardFormModal";
 import { CircularProgress } from "@/components/focus/CircularProgress";
 import { useFocusMode } from "@/components/layout/FocusModeContext";
@@ -65,29 +64,21 @@ export default function FocusPage() {
   }, [isRunning]);
 
   const totalSeconds = duration * 60;
-  const progress = totalSeconds === 0 ? 0 : ((totalSeconds - secondsLeft) / totalSeconds) * 100;
+  const progress =
+    totalSeconds === 0
+      ? 0
+      : ((totalSeconds - secondsLeft) / totalSeconds) * 100;
 
   return (
     <div className="mx-auto flex w-full max-w-md flex-col gap-6">
-      <div className="flex items-start justify-between">
-        <div>
-          <p className="font-mono text-xs uppercase tracking-[0.2em] text-vanta-text-dim">
-            Концентрация
-          </p>
-          <h1 className="mt-2 text-2xl font-semibold text-vanta-text">Фокус</h1>
-        </div>
-
-        <button
-          type="button"
-          onClick={() => setIsCardModalOpen(true)}
-          aria-label="Добавить карточку для повторения"
-          className="flex h-11 w-11 items-center justify-center rounded-full border border-vanta-border text-vanta-text-muted transition-colors hover:border-vanta-accent hover:text-vanta-accent"
-        >
-          <Plus className="h-4 w-4" strokeWidth={2} />
-        </button>
+      <div>
+        <p className="font-mono text-xs uppercase tracking-[0.2em] text-vanta-text-dim">
+          Концентрация
+        </p>
+        <h1 className="mt-2 text-2xl font-semibold text-vanta-text">Фокус</h1>
       </div>
 
-      <Card bracket className="flex flex-col items-center gap-10 p-10">
+      <div className="flex flex-col items-center gap-10 py-6">
         <div className="flex items-center gap-2">
           {durations.map((option) => (
             <button
@@ -108,7 +99,7 @@ export default function FocusPage() {
 
         <div className="relative flex h-[280px] w-[280px] items-center justify-center">
           <CircularProgress progress={progress} />
-          <p className="font-mono text-7xl font-semibold tabular-nums tracking-tight text-vanta-text">
+          <p className="font-sans text-7xl font-semibold tabular-nums tracking-tight text-vanta-text">
             {formatCountdown(secondsLeft)}
           </p>
         </div>
@@ -142,7 +133,16 @@ export default function FocusPage() {
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-vanta-text-dim">
           Сегодня: {formatDuration(todayMinutes)}
         </p>
-      </Card>
+
+        <button
+          type="button"
+          onClick={() => setIsCardModalOpen(true)}
+          className="flex items-center gap-2 rounded-full bg-white/5 px-4 py-2 text-sm text-white/50 transition-colors hover:bg-white/10 hover:text-white"
+        >
+          <Layers className="h-4 w-4" strokeWidth={1.75} />
+          Новая карточка
+        </button>
+      </div>
 
       <CardFormModal
         isOpen={isCardModalOpen}
