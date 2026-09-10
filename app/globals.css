@@ -32,4 +32,8 @@
   .pt-safe {
     padding-top: env(safe-area-inset-top);
   }
+
+  .fab-bottom {
+    bottom: calc(4.5rem + env(safe-area-inset-bottom));
+  }
 }
