@@ -188,7 +188,7 @@ export default function TasksPage() {
         type="button"
         onClick={openCreateModal}
         aria-label="Добавить задачу"
-        className="fixed bottom-24 right-4 flex h-14 w-14 items-center justify-center rounded-full bg-vanta-accent text-vanta-bg shadow-[0_12px_32px_-8px_rgba(201,162,75,0.5)] transition-opacity hover:opacity-90 md:bottom-8 md:right-8"
+        className="fixed bottom-[calc(4rem+env(safe-area-inset-bottom))] right-4 flex h-14 w-14 items-center justify-center rounded-full bg-vanta-accent text-vanta-bg shadow-[0_12px_32px_-8px_rgba(201,162,75,0.5)] transition-opacity hover:opacity-90 md:bottom-8 md:right-8"
       >
         <Plus className="h-6 w-6" strokeWidth={2} />
       </button>
