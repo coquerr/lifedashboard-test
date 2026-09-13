@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import type { FormEvent } from "react";
 import { Calendar, Clock, X } from "lucide-react";
 
@@ -29,25 +29,17 @@ export function TaskFormModal({
   defaultDate,
 }: TaskFormModalProps) {
   const [title, setTitle] = useState(task?.title ?? "");
-  const [date, setDate] = useState(task?.date ?? defaultDate);
-  const [time, setTime] = useState(task?.time ?? "");
+  const [manualDate, setManualDate] = useState(task?.date ?? defaultDate);
+  const [manualTime, setManualTime] = useState(task?.time ?? "");
   const [isDateTouched, setIsDateTouched] = useState(Boolean(task));
   const [isTimeTouched, setIsTimeTouched] = useState(Boolean(task));
 
   const debouncedTitle = useDebouncedValue(title, 350);
   const parsed = useMemo(() => parseNaturalLanguage(debouncedTitle), [debouncedTitle]);
 
-  useEffect(() => {
-    if (parsed.date && !isDateTouched) {
-      setDate(toISODate(parsed.date));
-    }
-  }, [parsed.date, isDateTouched]);
-
-  useEffect(() => {
-    if (parsed.time && !isTimeTouched) {
-      setTime(parsed.time);
-    }
-  }, [parsed.time, isTimeTouched]);
+  const date =
+    parsed.date && !isDateTouched ? toISODate(parsed.date) : manualDate;
+  const time = parsed.time && !isTimeTouched ? parsed.time : manualTime;
 
   const { isConfirming: confirmingDelete, handleClick: handleDeleteClick } = useConfirmDelete(
     () => {
@@ -58,12 +50,13 @@ export function TaskFormModal({
   const isValid = title.trim().length > 0;
 
   function dismissDateBadge() {
+    setManualDate(date);
     setIsDateTouched(true);
   }
 
   function dismissTimeBadge() {
+    setManualTime("");
     setIsTimeTouched(true);
-    setTime("");
   }
 
   function handleSubmit(event: FormEvent) {
@@ -93,7 +86,7 @@ export function TaskFormModal({
             value={title}
             onChange={(event) => setTitle(event.target.value)}
             placeholder="Например: Позвонить в банк завтра в 15:00"
-            className="rounded-xl border border-vanta-border bg-transparent px-3 py-2.5 text-sm text-vanta-text placeholder:text-vanta-text-dim outline-none focus:border-vanta-accent"
+            className="rounded-xl border border-vanta-border bg-transparent px-3 py-2.5 text-base text-vanta-text placeholder:text-vanta-text-dim outline-none focus:border-vanta-accent"
           />
           {showDateBadge || showTimeBadge ? (
             <div className="flex flex-wrap gap-1.5 pt-0.5">
@@ -133,10 +126,10 @@ export function TaskFormModal({
               type="date"
               value={date}
               onChange={(event) => {
-                setDate(event.target.value);
+                setManualDate(event.target.value);
                 setIsDateTouched(true);
               }}
-              className="rounded-xl border border-vanta-border bg-transparent px-3 py-2.5 text-sm text-vanta-text outline-none focus:border-vanta-accent [color-scheme:dark]"
+              className="rounded-xl border border-vanta-border bg-transparent px-3 py-2.5 text-base text-vanta-text outline-none focus:border-vanta-accent [color-scheme:dark]"
             />
           </div>
           <div className="flex flex-1 flex-col gap-1.5">
@@ -148,10 +141,10 @@ export function TaskFormModal({
               type="time"
               value={time}
               onChange={(event) => {
-                setTime(event.target.value);
+                setManualTime(event.target.value);
                 setIsTimeTouched(true);
               }}
-              className="rounded-xl border border-vanta-border bg-transparent px-3 py-2.5 text-sm text-vanta-text outline-none focus:border-vanta-accent [color-scheme:dark]"
+              className="rounded-xl border border-vanta-border bg-transparent px-3 py-2.5 text-base text-vanta-text outline-none focus:border-vanta-accent [color-scheme:dark]"
             />
           </div>
         </div>

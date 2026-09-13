@@ -32,7 +32,10 @@ export function TasksCard() {
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-vanta-text-dim">
           Задачи на сегодня
         </p>
-        <Link href="/tasks" className="text-xs text-vanta-text-muted hover:text-vanta-accent">
+        <Link
+          href="/tasks"
+          className="text-xs text-vanta-text-muted hover:text-vanta-accent"
+        >
           {doneCount}/{tasks.length}
         </Link>
       </div>
@@ -42,21 +45,31 @@ export function TasksCard() {
       <ul className="flex flex-col gap-2">
         {tasks.map((task) => (
           <li key={task.id} className="flex items-center gap-3">
-            <Checkbox checked={task.done} onChange={() => toggleTask(task.id)} label={task.title} />
+            <Checkbox
+              checked={task.done}
+              onChange={() => toggleTask(task.id)}
+              label={task.title}
+            />
             <span
               className={`text-sm ${
-                task.done ? "text-vanta-text-dim line-through" : "text-vanta-text"
+                task.done
+                  ? "text-vanta-text-dim line-through"
+                  : "text-vanta-text"
               }`}
             >
               {task.title}
             </span>
             {task.time ? (
-              <span className="ml-auto font-mono text-xs text-vanta-text-dim">{task.time}</span>
+              <span className="ml-auto font-mono text-xs text-vanta-text-dim">
+                {task.time}
+              </span>
             ) : null}
           </li>
         ))}
         {tasks.length === 0 ? (
-          <li className="text-sm text-vanta-text-muted">Задач на сегодня пока нет</li>
+          <li className="text-sm text-vanta-text-muted">
+            Задач на сегодня пока нет
+          </li>
         ) : null}
       </ul>
 
@@ -68,7 +81,7 @@ export function TasksCard() {
             if (event.key === "Enter") handleAdd();
           }}
           placeholder="Новая задача на сегодня"
-          className="flex-1 rounded-xl border-none bg-white/5 px-3 py-2 text-sm text-vanta-text placeholder:text-vanta-text-dim outline-none transition-all focus:bg-white/[0.07] focus:ring-1 focus:ring-vanta-accent"
+          className="flex-1 rounded-xl border-none bg-white/5 px-3 py-2 text-base text-vanta-text placeholder:text-vanta-text-dim outline-none transition-all focus:bg-white/[0.07] focus:ring-1 focus:ring-vanta-accent"
         />
         <button
           type="button"

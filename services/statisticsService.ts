@@ -10,7 +10,7 @@ import type { Task } from "@/types/tasks";
 import type { WaterLog } from "@/types/water";
 
 const FOCUS_TARGET_MINUTES = 60;
-const WORKOUT_HABIT_ICON = "🏋️";
+const WORKOUT_HABIT_ICON_ID = "dumbbell";
 const MIN_COMPARISON_SAMPLE = 3;
 
 export interface TodaySummary {
@@ -187,7 +187,8 @@ export function computeDailyScore(
       : Math.round(Math.min(1, summary.waterMl / summary.waterGoalMl) * 15);
 
   const hasWorkoutHabitDoneToday = habits.some(
-    (habit) => habit.icon === WORKOUT_HABIT_ICON && habitsService.isHabitDoneOnDate(habit, today),
+  (habit) =>
+    habit.icon === WORKOUT_HABIT_ICON_ID && habitsService.isHabitDoneOnDate(habit, today),
   );
   const otherScore = hasWorkoutHabitDoneToday ? 10 : 0;
 

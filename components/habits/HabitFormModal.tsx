@@ -5,7 +5,11 @@ import type { FormEvent } from "react";
 
 import { Modal } from "@/components/ui/Modal";
 import { useConfirmDelete } from "@/hooks/useConfirmDelete";
-import { DEFAULT_HABIT_ICON_ID, HABIT_ICON_IDS, HABIT_ICON_MAP } from "@/lib/habitIconMap";
+import {
+  DEFAULT_HABIT_ICON_ID,
+  HABIT_ICON_IDS,
+  HABIT_ICON_MAP,
+} from "@/lib/habitIconMap";
 import type { Habit, HabitFrequency, HabitInput } from "@/types/habits";
 
 const TITLE_PLACEHOLDERS = [
@@ -30,7 +34,13 @@ interface HabitFormModalProps {
   habit?: Habit | null;
 }
 
-export function HabitFormModal({ isOpen, onClose, onSave, onDelete, habit }: HabitFormModalProps) {
+export function HabitFormModal({
+  isOpen,
+  onClose,
+  onSave,
+  onDelete,
+  habit,
+}: HabitFormModalProps) {
   const [title, setTitle] = useState(habit?.title ?? "");
   const [icon, setIcon] = useState(habit?.icon ?? DEFAULT_HABIT_ICON_ID);
   const [frequencyType, setFrequencyType] = useState<HabitFrequency["type"]>(
@@ -41,12 +51,11 @@ export function HabitFormModal({ isOpen, onClose, onSave, onDelete, habit }: Hab
   );
   const [placeholder] = useState(getRandomPlaceholder);
 
-  const { isConfirming: confirmingDelete, handleClick: handleDeleteClick } = useConfirmDelete(
-    () => {
+  const { isConfirming: confirmingDelete, handleClick: handleDeleteClick } =
+    useConfirmDelete(() => {
       onDelete?.();
       onClose();
-    },
-  );
+    });
   const isValid = title.trim().length > 0;
 
   function handleSubmit(event: FormEvent) {
@@ -55,17 +64,26 @@ export function HabitFormModal({ isOpen, onClose, onSave, onDelete, habit }: Hab
     if (trimmed.length === 0) return;
 
     const frequency: HabitFrequency =
-      frequencyType === "daily" ? { type: "daily" } : { type: "weekly", timesPerWeek };
+      frequencyType === "daily"
+        ? { type: "daily" }
+        : { type: "weekly", timesPerWeek };
 
     onSave({ title: trimmed, icon, frequency });
     onClose();
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={habit ? "Изменить привычку" : "Новая привычка"}>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={habit ? "Изменить привычку" : "Новая привычка"}
+    >
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="habit-title" className="text-xs text-vanta-text-muted">
+          <label
+            htmlFor="habit-title"
+            className="text-xs text-vanta-text-muted"
+          >
             Название
           </label>
           <input
@@ -74,7 +92,7 @@ export function HabitFormModal({ isOpen, onClose, onSave, onDelete, habit }: Hab
             value={title}
             onChange={(event) => setTitle(event.target.value)}
             placeholder={placeholder}
-            className="rounded-xl border border-vanta-border bg-transparent px-3 py-2.5 text-sm text-vanta-text placeholder:text-vanta-text-dim outline-none focus:border-vanta-accent"
+            className="rounded-xl border border-vanta-border bg-transparent px-3 py-2.5 text-base text-vanta-text placeholder:text-vanta-text-dim outline-none focus:border-vanta-accent"
           />
         </div>
 
@@ -135,20 +153,28 @@ export function HabitFormModal({ isOpen, onClose, onSave, onDelete, habit }: Hab
             <div className="mt-1 flex items-center gap-3">
               <button
                 type="button"
-                onClick={() => setTimesPerWeek((value) => Math.max(1, value - 1))}
+                onClick={() =>
+                  setTimesPerWeek((value) => Math.max(1, value - 1))
+                }
                 className="flex h-9 w-9 items-center justify-center rounded-xl border border-vanta-border text-vanta-text-muted transition-colors hover:text-vanta-text"
               >
                 −
               </button>
-              <span className="w-6 text-center text-sm text-vanta-text">{timesPerWeek}</span>
+              <span className="w-6 text-center text-sm text-vanta-text">
+                {timesPerWeek}
+              </span>
               <button
                 type="button"
-                onClick={() => setTimesPerWeek((value) => Math.min(7, value + 1))}
+                onClick={() =>
+                  setTimesPerWeek((value) => Math.min(7, value + 1))
+                }
                 className="flex h-9 w-9 items-center justify-center rounded-xl border border-vanta-border text-vanta-text-muted transition-colors hover:text-vanta-text"
               >
                 +
               </button>
-              <span className="text-sm text-vanta-text-muted">раз в неделю</span>
+              <span className="text-sm text-vanta-text-muted">
+                раз в неделю
+              </span>
             </div>
           ) : null}
         </div>

@@ -145,7 +145,7 @@ export default function TasksPage() {
           onChange={(event) => setQuickDraft(event.target.value)}
           onKeyDown={handleQuickInputKeyDown}
           placeholder="Например: Тренировка завтра в 19:00..."
-          className="rounded-xl bg-white/5 px-4 py-3 text-sm text-vanta-text placeholder:text-vanta-text-dim outline-none transition-all focus:bg-white/[0.07] focus:ring-1 focus:ring-vanta-accent"
+          className="rounded-xl bg-white/5 px-4 py-3 text-base text-vanta-text placeholder:text-vanta-text-dim outline-none transition-all focus:bg-white/[0.07] focus:ring-1 focus:ring-vanta-accent"
         />
 
         <div

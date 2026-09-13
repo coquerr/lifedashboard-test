@@ -153,8 +153,8 @@ export default function ExpensesPage() {
           value={quickDraft}
           onChange={(event) => setQuickDraft(event.target.value)}
           onKeyDown={handleQuickInputKeyDown}
-          placeholder="Например: KSB-80 1800..."
-          className="rounded-xl bg-white/5 px-4 py-3 text-sm text-vanta-text placeholder:text-vanta-text-dim outline-none transition-all focus:bg-white/[0.07] focus:ring-1 focus:ring-vanta-accent"
+          placeholder="Например: Кофе 350..."
+          className="rounded-xl bg-white/5 px-4 py-3 text-base text-vanta-text placeholder:text-vanta-text-dim outline-none transition-all focus:bg-white/[0.07] focus:ring-1 focus:ring-vanta-accent"
         />
 
         <div className="flex flex-col">

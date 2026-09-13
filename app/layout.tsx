@@ -32,6 +32,10 @@ const APPLE_SPLASH_SCREENS = [
 export const metadata: Metadata = {
   title: "VANTA",
   description: "Персональная панель управления повседневной жизнью",
+  robots: {
+    index: false,
+    follow: false,
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",

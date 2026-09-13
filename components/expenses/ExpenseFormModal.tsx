@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import type { FormEvent } from "react";
 import { Tag, Wallet, X } from "lucide-react";
 
@@ -23,35 +23,36 @@ const CATEGORY_LABELS: Record<string, string> = Object.fromEntries(
 
 export function ExpenseFormModal({ isOpen, onClose, onSave }: ExpenseFormModalProps) {
   const [title, setTitle] = useState("");
-  const [amount, setAmount] = useState("");
-  const [category, setCategory] = useState<ExpenseCategory>(EXPENSE_CATEGORIES[0].value);
+  const [manualAmount, setManualAmount] = useState("");
+  const [manualCategory, setManualCategory] = useState<ExpenseCategory>(
+    EXPENSE_CATEGORIES[0].value,
+  );
   const [isAmountTouched, setIsAmountTouched] = useState(false);
   const [isCategoryTouched, setIsCategoryTouched] = useState(false);
 
   const debouncedTitle = useDebouncedValue(title, 350);
   const parsed = useMemo(() => parseNaturalLanguage(debouncedTitle), [debouncedTitle]);
 
-  useEffect(() => {
-    if (parsed.amount !== null && !isAmountTouched) {
-      setAmount(String(parsed.amount));
-    }
-  }, [parsed.amount, isAmountTouched]);
+  const amount =
+    parsed.amount !== null && !isAmountTouched ? String(parsed.amount) : manualAmount;
 
-  useEffect(() => {
-    if (parsed.categoryHint && !isCategoryTouched) {
-      const match = EXPENSE_CATEGORIES.find((option) => option.value === parsed.categoryHint);
-      if (match) setCategory(match.value);
-    }
-  }, [parsed.categoryHint, isCategoryTouched]);
+  const matchedCategory = useMemo(
+    () => EXPENSE_CATEGORIES.find((option) => option.value === parsed.categoryHint),
+    [parsed.categoryHint],
+  );
+  const category =
+    matchedCategory && !isCategoryTouched ? matchedCategory.value : manualCategory;
 
   const parsedAmount = Number(amount.replace(",", "."));
   const isValid = title.trim().length > 0 && Number.isFinite(parsedAmount) && parsedAmount > 0;
 
   function dismissAmountBadge() {
+    setManualAmount(amount);
     setIsAmountTouched(true);
   }
 
   function dismissCategoryBadge() {
+    setManualCategory(category);
     setIsCategoryTouched(true);
   }
 
@@ -83,7 +84,7 @@ export function ExpenseFormModal({ isOpen, onClose, onSave }: ExpenseFormModalPr
             value={title}
             onChange={(event) => setTitle(event.target.value)}
             placeholder="Например: Протеин 1800"
-            className="rounded-xl border border-vanta-border bg-transparent px-3 py-2.5 text-sm text-vanta-text placeholder:text-vanta-text-dim outline-none focus:border-vanta-accent"
+            className="rounded-xl border border-vanta-border bg-transparent px-3 py-2.5 text-base text-vanta-text placeholder:text-vanta-text-dim outline-none focus:border-vanta-accent"
           />
           {showAmountBadge || showCategoryBadge ? (
             <div className="flex flex-wrap gap-1.5 pt-0.5">
@@ -125,11 +126,11 @@ export function ExpenseFormModal({ isOpen, onClose, onSave }: ExpenseFormModalPr
             step="0.01"
             value={amount}
             onChange={(event) => {
-              setAmount(event.target.value);
+              setManualAmount(event.target.value);
               setIsAmountTouched(true);
             }}
             placeholder="0"
-            className="rounded-xl border border-vanta-border bg-transparent px-3 py-2.5 text-sm text-vanta-text placeholder:text-vanta-text-dim outline-none focus:border-vanta-accent"
+            className="rounded-xl border border-vanta-border bg-transparent px-3 py-2.5 text-base text-vanta-text placeholder:text-vanta-text-dim outline-none focus:border-vanta-accent"
           />
         </div>
 
@@ -145,7 +146,7 @@ export function ExpenseFormModal({ isOpen, onClose, onSave }: ExpenseFormModalPr
                   key={option.value}
                   type="button"
                   onClick={() => {
-                    setCategory(option.value);
+                    setManualCategory(option.value);
                     setIsCategoryTouched(true);
                   }}
                   aria-pressed={isSelected}

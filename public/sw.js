@@ -1,4 +1,9 @@
-const CACHE_NAME = "vanta-cache-v1";
+// Версия кеша — меняйте это число при каждом релизе, где меняется
+// содержимое кешируемых ассетов (HTML/CSS/JS). Изменение этой строки
+// заставляет браузер увидеть sw.js как "новый файл" и запустить
+// install → activate, что чистит старый кеш через CACHE_NAME.
+const CACHE_VERSION = "1";
+const CACHE_NAME = `vanta-cache-v${CACHE_VERSION}`;
 
 self.addEventListener("install", () => {
   self.skipWaiting();

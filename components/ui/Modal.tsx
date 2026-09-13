@@ -33,14 +33,6 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
     };
   }, [isOpen, onClose]);
 
-  useEffect(() => {
-    if (!isOpen) {
-      setDragY(0);
-      touchStartY.current = null;
-      isDragging.current = false;
-    }
-  }, [isOpen]);
-
   function handleTouchStart(event: React.TouchEvent) {
     touchStartY.current = event.touches[0].clientY;
     isDragging.current = true;
