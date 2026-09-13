@@ -50,13 +50,22 @@ export interface DailyScore {
   breakdown: DailyScoreBreakdown;
 }
 
-export interface WeekComparison {
-  message: string | null;
-}
-
 export interface StackedDayPoint {
   label: string;
   segments: { tag: FocusTag; value: number }[];
+}
+
+/**
+ * Направление "хорошей" динамики для метрики: rise — рост это хорошо
+ * (задачи, вода), fall — падение это хорошо (расходы).
+ */
+export type ComparisonDirection = "rise" | "fall";
+
+export interface WeekOverWeekComparison {
+  currentTotal: number;
+  previousTotal: number;
+  percentChange: number | null;
+  isPositive: boolean | null;
 }
 
 function capitalize(value: string): string {
@@ -198,49 +207,100 @@ export function computeDailyScore(
 }
 
 /**
- * Сравнивает выполненные задачи "с начала этой недели по сегодня" с тем
- * же количеством дней прошлой недели (честное сравнение "день к дню",
- * а не полная прошлая неделя против неполной текущей).
+ * Возвращает диапазон [start, end] "текущей недели по сегодня" и
+ * симметричный диапазон той же длины на прошлой неделе — так сравнение
+ * идёт "день к дню" (например, 3 дня этой недели против первых 3 дней
+ * прошлой), а не полная неделя против неполной текущей.
  */
-export function compareWeeklyTasks(tasks: Task[], referenceDate: Date): WeekComparison {
+function getComparableWeekRanges(referenceDate: Date): {
+  currentStartISO: string;
+  currentEndISO: string;
+  previousStartISO: string;
+  previousEndISO: string;
+} {
   const currentWeekStart = startOfWeek(referenceDate);
   const daysElapsed =
     Math.floor((referenceDate.getTime() - currentWeekStart.getTime()) / 86_400_000) + 1;
-
-  const currentWeekStartISO = toISODate(currentWeekStart);
-  const todayISOStr = toISODate(referenceDate);
 
   const previousWeekStart = new Date(currentWeekStart);
   previousWeekStart.setDate(previousWeekStart.getDate() - 7);
   const previousWeekComparableEnd = new Date(previousWeekStart);
   previousWeekComparableEnd.setDate(previousWeekComparableEnd.getDate() + daysElapsed - 1);
 
-  const previousWeekStartISO = toISODate(previousWeekStart);
-  const previousWeekComparableEndISO = toISODate(previousWeekComparableEnd);
-
-  const currentCount = tasks.filter(
-    (task) => task.done && task.date >= currentWeekStartISO && task.date <= todayISOStr,
-  ).length;
-
-  const previousCount = tasks.filter(
-    (task) =>
-      task.done &&
-      task.date >= previousWeekStartISO &&
-      task.date <= previousWeekComparableEndISO,
-  ).length;
-
-  if (previousCount < MIN_COMPARISON_SAMPLE) {
-    return { message: null };
-  }
-
-  const percentChange = Math.round(((currentCount - previousCount) / previousCount) * 100);
-
-  if (percentChange === 0) {
-    return { message: "На этой неделе ты выполняешь задачи так же активно, как на прошлой." };
-  }
-
-  const direction = percentChange > 0 ? "больше" : "меньше";
   return {
-    message: `На этой неделе ты выполнил на ${Math.abs(percentChange)}% ${direction} задач, чем на прошлой за это же время.`,
+    currentStartISO: toISODate(currentWeekStart),
+    currentEndISO: toISODate(referenceDate),
+    previousStartISO: toISODate(previousWeekStart),
+    previousEndISO: toISODate(previousWeekComparableEnd),
   };
+}
+
+/**
+ * Обобщённая "неделя к неделе" агрегация: принимает произвольную
+ * функцию суммирования значения за диапазон дат и направление хорошей
+ * динамики (rise/fall), возвращает суммы + процент изменения.
+ *
+ * Используется для задач, воды и расходов — единая логика вместо трёх
+ * почти одинаковых функций.
+ */
+export function compareWeekOverWeek(
+  referenceDate: Date,
+  direction: ComparisonDirection,
+  sumForRange: (startISO: string, endISO: string) => number,
+): WeekOverWeekComparison {
+  const { currentStartISO, currentEndISO, previousStartISO, previousEndISO } =
+    getComparableWeekRanges(referenceDate);
+
+  const currentTotal = sumForRange(currentStartISO, currentEndISO);
+  const previousTotal = sumForRange(previousStartISO, previousEndISO);
+
+  if (previousTotal < MIN_COMPARISON_SAMPLE) {
+    return { currentTotal, previousTotal, percentChange: null, isPositive: null };
+  }
+
+  const percentChange = Math.round(((currentTotal - previousTotal) / previousTotal) * 100);
+  const isPositive =
+    percentChange === 0 ? null : direction === "rise" ? percentChange > 0 : percentChange < 0;
+
+  return { currentTotal, previousTotal, percentChange, isPositive };
+}
+
+export function compareWeeklyTasksCount(tasks: Task[], referenceDate: Date): WeekOverWeekComparison {
+  return compareWeekOverWeek(referenceDate, "rise", (startISO, endISO) =>
+    tasks.filter((task) => task.done && task.date >= startISO && task.date <= endISO).length,
+  );
+}
+
+/**
+ * Суммирует воду за диапазон дат [startISO, endISO] включительно,
+ * перебирая дни через уже существующую getAmountForDate — в
+ * waterService нет отдельной функции для диапазона.
+ */
+function sumWaterInRange(waterLog: WaterLog, startISO: string, endISO: string): number {
+  let total = 0;
+  let cursor = new Date(`${startISO}T00:00:00`);
+  const end = new Date(`${endISO}T00:00:00`);
+
+  while (cursor <= end) {
+    total += waterService.getAmountForDate(waterLog, toISODate(cursor));
+    cursor = new Date(cursor);
+    cursor.setDate(cursor.getDate() + 1);
+  }
+
+  return total;
+}
+
+export function compareWeeklyWater(waterLog: WaterLog, referenceDate: Date): WeekOverWeekComparison {
+  return compareWeekOverWeek(referenceDate, "rise", (startISO, endISO) =>
+    sumWaterInRange(waterLog, startISO, endISO),
+  );
+}
+
+export function compareWeeklyExpenses(
+  expenses: Expense[],
+  referenceDate: Date,
+): WeekOverWeekComparison {
+  return compareWeekOverWeek(referenceDate, "fall", (startISO, endISO) =>
+    expensesService.sumExpenses(expensesService.getExpensesInRange(expenses, startISO, endISO)),
+  );
 }

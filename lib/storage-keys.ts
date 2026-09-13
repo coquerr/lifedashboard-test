@@ -9,5 +9,4 @@ export const STORAGE_KEYS = {
   water: "vanta:water:v2",
   focus: "vanta:focus:v2",
   expenses: "vanta:expenses",
-  flashcards: "vanta:flashcards",
 } as const;

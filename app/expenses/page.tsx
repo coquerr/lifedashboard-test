@@ -12,6 +12,7 @@ import { EXPENSE_CATEGORIES } from "@/lib/expense-categories";
 import { formatMoney } from "@/lib/format";
 import { parseNaturalLanguage } from "@/lib/smartParser";
 import * as expensesService from "@/services/expensesService";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 type RangeKey = "today" | "week" | "month";
 
@@ -42,7 +43,11 @@ export default function ExpensesPage() {
     return toISODate(startOfMonth(new Date()));
   }, [range, today]);
 
-  const filtered = expensesService.getExpensesInRange(expenses, fromDate, today);
+  const filtered = expensesService.getExpensesInRange(
+    expenses,
+    fromDate,
+    today,
+  );
   const total = expensesService.sumExpenses(filtered);
 
   function openCreateModal() {
@@ -87,7 +92,11 @@ export default function ExpensesPage() {
 
     touchStart.current = null;
 
-    if (Math.abs(deltaX) < SWIPE_THRESHOLD || Math.abs(deltaX) < Math.abs(deltaY)) return;
+    if (
+      Math.abs(deltaX) < SWIPE_THRESHOLD ||
+      Math.abs(deltaX) < Math.abs(deltaY)
+    )
+      return;
 
     const currentIndex = RANGE_ORDER.indexOf(range);
     const nextIndex = deltaX < 0 ? currentIndex + 1 : currentIndex - 1;
@@ -150,10 +159,13 @@ export default function ExpensesPage() {
 
         <div className="flex flex-col">
           {filtered.length === 0 ? (
-            <div className="flex flex-col items-center gap-3 px-3 py-10 text-center">
-              <Receipt className="h-8 w-8 text-vanta-text-dim" strokeWidth={1.5} />
-              <p className="text-sm text-vanta-text-muted">Расходов за этот период нет</p>
-            </div>
+            <EmptyState
+              icon={Receipt}
+              title="Финансы под контролем."
+              description="Вы ничего не потратили, либо еще не успели внести запись."
+              actionLabel="+ Записать расход"
+              onAction={openCreateModal}
+            />
           ) : (
             filtered.map((expense) => (
               <ExpenseRow

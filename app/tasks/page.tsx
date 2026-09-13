@@ -12,11 +12,13 @@ import { useTasks } from "@/hooks/useTasks";
 import { addDaysISO, formatDateHuman, todayISO, toISODate } from "@/lib/date";
 import { parseNaturalLanguage } from "@/lib/smartParser";
 import type { Task, TaskInput } from "@/types/tasks";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 const SWIPE_THRESHOLD = 50;
 
 export default function TasksPage() {
-  const { getTasksForDate, addTask, editTask, removeTask, toggleTask } = useTasks();
+  const { getTasksForDate, addTask, editTask, removeTask, toggleTask } =
+    useTasks();
   const [selectedDate, setSelectedDate] = useState(todayISO());
   const [modalOpen, setModalOpen] = useState(false);
   const [modalKey, setModalKey] = useState(0);
@@ -79,7 +81,11 @@ export default function TasksPage() {
 
     touchStart.current = null;
 
-    if (Math.abs(deltaX) < SWIPE_THRESHOLD || Math.abs(deltaX) < Math.abs(deltaY)) return;
+    if (
+      Math.abs(deltaX) < SWIPE_THRESHOLD ||
+      Math.abs(deltaX) < Math.abs(deltaY)
+    )
+      return;
 
     setSelectedDate((date) => addDaysISO(date, deltaX < 0 ? 1 : -1));
   }
@@ -91,7 +97,9 @@ export default function TasksPage() {
           <p className="font-mono text-xs uppercase tracking-[0.2em] text-vanta-text-dim">
             Планирование
           </p>
-          <h1 className="mt-2 text-2xl font-semibold text-vanta-text">Задачи</h1>
+          <h1 className="mt-2 text-2xl font-semibold text-vanta-text">
+            Задачи
+          </h1>
         </div>
 
         <div className="hidden items-center justify-between lg:flex">
@@ -126,7 +134,10 @@ export default function TasksPage() {
           <p className="mb-2 text-center text-sm font-medium capitalize text-vanta-text">
             {formatDateHuman(selectedDate)}
           </p>
-          <WeekStrip selectedDate={selectedDate} onSelectDate={setSelectedDate} />
+          <WeekStrip
+            selectedDate={selectedDate}
+            onSelectDate={setSelectedDate}
+          />
         </div>
 
         <input
@@ -143,9 +154,14 @@ export default function TasksPage() {
           onTouchEnd={handleTouchEnd}
         >
           {tasksForDay.length === 0 ? (
-            <div className="flex flex-1 flex-col items-center justify-center gap-3 px-3 py-10 text-center">
-              <CalendarX2 className="h-8 w-8 text-vanta-text-dim" strokeWidth={1.5} />
-              <p className="text-sm text-vanta-text-muted">На этот день задач нет</p>
+            <div className="flex flex-1 flex-col items-center justify-center">
+              <EmptyState
+                icon={CalendarX2}
+                title="Свободный день."
+                description="Добавьте главную задачу, чтобы задать фокус."
+                actionLabel="+ Создать задачу"
+                onAction={openCreateModal}
+              />
             </div>
           ) : (
             tasksForDay.map((task) => (
@@ -165,13 +181,17 @@ export default function TasksPage() {
                 >
                   <span
                     className={`text-sm ${
-                      task.done ? "text-vanta-text-dim line-through" : "text-vanta-text"
+                      task.done
+                        ? "text-vanta-text-dim line-through"
+                        : "text-vanta-text"
                     }`}
                   >
                     {task.title}
                   </span>
                   {task.time ? (
-                    <span className="font-mono text-xs text-vanta-text-dim">{task.time}</span>
+                    <span className="font-mono text-xs text-vanta-text-dim">
+                      {task.time}
+                    </span>
                   ) : null}
                 </button>
               </div>

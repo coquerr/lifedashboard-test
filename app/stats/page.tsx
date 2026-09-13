@@ -3,9 +3,10 @@
 import { useState } from "react";
 import { Droplet, ListChecks, Repeat, Timer, Wallet } from "lucide-react";
 
-import { ComparisonCard } from "@/components/statistics/ComparisonCard";
 import { StatTile } from "@/components/statistics/StatTile";
 import { WeeklyChartCard } from "@/components/statistics/WeeklyChartCard";
+import { WeeklyOverview } from "@/components/statistics/WeeklyOverview";
+import { WeeklyExpensesChart } from "@/components/statistics/WeeklyExpensesChart";
 import { useExpenses } from "@/hooks/useExpenses";
 import { useFocusLog } from "@/hooks/useFocusLog";
 import { useHabits } from "@/hooks/useHabits";
@@ -56,7 +57,9 @@ export default function StatsPage() {
     referenceDate,
   );
 
-  const comparison = statisticsService.compareWeeklyTasks(tasks, referenceDate);
+  const tasksComparison = statisticsService.compareWeeklyTasksCount(tasks, referenceDate);
+  const waterComparison = statisticsService.compareWeeklyWater(waterLog, referenceDate);
+  const expensesComparison = statisticsService.compareWeeklyExpenses(expenses, referenceDate);
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-8">
@@ -124,6 +127,31 @@ export default function StatsPage() {
         ))}
       </div>
 
+      {activeTab === "summary" ? (
+        <section className="flex flex-col gap-4">
+          <p className="text-sm font-medium text-vanta-text-muted">Эта неделя</p>
+          <WeeklyOverview
+            cards={[
+              {
+                label: "Задачи за неделю",
+                value: `${tasksComparison.currentTotal}`,
+                comparison: tasksComparison,
+              },
+              {
+                label: "Вода за неделю",
+                value: `${formatLiters(waterComparison.currentTotal)} л`,
+                comparison: waterComparison,
+              },
+              {
+                label: "Расходы за неделю",
+                value: formatMoney(expensesComparison.currentTotal),
+                comparison: expensesComparison,
+              },
+            ]}
+          />
+        </section>
+      ) : null}
+
       {activeTab === "productivity" ? (
         <section className="flex flex-col gap-4">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -138,7 +166,6 @@ export default function StatsPage() {
               />
             </Card>
           </div>
-          {comparison.message ? <ComparisonCard message={comparison.message} /> : null}
         </section>
       ) : null}
 
@@ -161,6 +188,7 @@ export default function StatsPage() {
             data={weeklySeries.expenses}
             formatValue={(value) => formatMoney(value)}
           />
+          <WeeklyExpensesChart data={weeklySeries.expenses} />
         </section>
       ) : null}
     </div>

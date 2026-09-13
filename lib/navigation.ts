@@ -4,6 +4,7 @@ import {
   LayoutDashboard,
   ListChecks,
   Repeat,
+  Settings,
   Timer,
   Wallet,
 } from "lucide-react";
@@ -18,4 +19,5 @@ export const navItems: NavItem[] = [
   { label: "Вода", href: "/water", icon: Droplet, enabled: true, primary: false },
   { label: "Фокус", href: "/focus", icon: Timer, enabled: true, primary: false },
   { label: "Статистика", href: "/stats", icon: BarChart3, enabled: true, primary: false },
+  { label: "Настройки", href: "/settings", icon: Settings, enabled: true, primary: false },
 ];

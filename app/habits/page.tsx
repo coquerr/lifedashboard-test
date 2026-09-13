@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Repeat } from "lucide-react";
+import { Plus, RefreshCw } from "lucide-react";
 
 import { Card } from "@/components/ui/Card";
 import { Checkbox } from "@/components/ui/Checkbox";
@@ -12,6 +12,7 @@ import { todayISO } from "@/lib/date";
 import { HABIT_ICON_MAP } from "@/lib/habitIconMap";
 import { getWeeklyProgress, isHabitDoneOnDate } from "@/services/habitsService";
 import type { Habit, HabitInput } from "@/types/habits";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 export default function HabitsPage() {
   const { habits, addHabit, editHabit, removeHabit, toggleHabit } = useHabits();
@@ -46,14 +47,19 @@ export default function HabitsPage() {
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-vanta-text-dim">
           Регулярность
         </p>
-        <h1 className="mt-2 text-2xl font-semibold text-vanta-text">Привычки</h1>
+        <h1 className="mt-2 text-2xl font-semibold text-vanta-text">
+          Привычки
+        </h1>
       </div>
 
       {habits.length === 0 ? (
-        <div className="flex flex-col items-center gap-3 py-16 text-center">
-          <Repeat className="h-8 w-8 text-vanta-text-dim" strokeWidth={1.5} />
-          <p className="text-sm text-vanta-text-muted">Пока нет ни одной привычки</p>
-        </div>
+        <EmptyState
+          icon={RefreshCw}
+          title="Чистый лист."
+          description="Дисциплина начинается с малого. Выберите действие для повторения."
+          actionLabel="+ Добавить привычку"
+          onAction={openCreateModal}
+        />
       ) : (
         <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
           {habits.map((habit) => {

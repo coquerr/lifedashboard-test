@@ -1,12 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { Layers, Pause, Play, RotateCcw } from "lucide-react";
+import { useEffect, useRef } from "react";
+import { Pause, Play, RotateCcw } from "lucide-react";
 
-import { CardFormModal } from "@/components/focus/CardFormModal";
 import { CircularProgress } from "@/components/focus/CircularProgress";
 import { useFocusMode } from "@/components/layout/FocusModeContext";
-import { useFlashcards } from "@/hooks/useFlashcards";
 import { useFocusTimer } from "@/hooks/useFocusTimer";
 import { formatCountdown, formatDuration } from "@/lib/format";
 
@@ -24,8 +22,6 @@ export default function FocusPage() {
 
   const { setFocusMode } = useFocusMode();
   const wakeLockRef = useRef<WakeLockSentinel | null>(null);
-  const { addCard } = useFlashcards();
-  const [isCardModalOpen, setIsCardModalOpen] = useState(false);
 
   useEffect(() => {
     setFocusMode(isRunning);
@@ -133,22 +129,7 @@ export default function FocusPage() {
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-vanta-text-dim">
           Сегодня: {formatDuration(todayMinutes)}
         </p>
-
-        <button
-          type="button"
-          onClick={() => setIsCardModalOpen(true)}
-          className="flex items-center gap-2 rounded-full bg-white/5 px-4 py-2 text-sm text-white/50 transition-colors hover:bg-white/10 hover:text-white"
-        >
-          <Layers className="h-4 w-4" strokeWidth={1.75} />
-          Новая карточка
-        </button>
       </div>
-
-      <CardFormModal
-        isOpen={isCardModalOpen}
-        onClose={() => setIsCardModalOpen(false)}
-        onSave={addCard}
-      />
     </div>
   );
 }
